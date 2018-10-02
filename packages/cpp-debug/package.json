@@ -1,0 +1,45 @@
+{
+  "name": "@theia/cpp-debug",
+  "description": "Theia - C/C++ Debug Extension",
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theia-ide/theia.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/theia-ide/theia/issues"
+  },
+  "homepage": "https://github.com/theia-ide/theia",
+  "keywords": [
+    "theia-extension", "cpp", "debug"
+  ],
+  "version": "0.3.15",
+  "files": [
+    "data",
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "next",
+    "@theia/debug": "next"
+  },
+  "devDependencies": {
+    "rimraf": "latest",
+    "tar": "^4.0.0",
+    "typescript": "^2"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "concurrently -n download,build -c red,blue \"node ./scripts/download-code-debug.js\" \"tsc\"",
+    "watch": "tsc -w"
+  },
+  "theiaExtensions": [{
+      "backend": "lib/node/cpp-debug-backend-module"
+  }],
+  "debugAdapter": {
+    "downloadUrl": "https://github.com/marechal-p/code-debug/releases/download/v0.22.0/code-debug.tar.gz",
+    "dir": "lib/adapter"
+  }
+}
