@@ -14,7 +14,7 @@
   "keywords": [
     "theia-extension", "cpp", "debug"
   ],
-  "version": "0.3.15",
+  "version": "0.3.16",
   "files": [
     "data",
     "lib",
@@ -25,21 +25,23 @@
     "@theia/debug": "next"
   },
   "devDependencies": {
-    "rimraf": "latest",
+    "rimraf": "^2.6.2",
     "tar": "^4.0.0",
-    "typescript": "^2"
+    "typescript": "^3",
+    "unzip-stream": "^0.3.0",
+    "zlib": "^1.0.5"
   },
   "scripts": {
+    "postinstall": "node ./scripts/download-adapters.js",
     "prepare": "yarn run clean && yarn run build",
     "clean": "rimraf lib",
-    "build": "concurrently -n download,build -c red,blue \"node ./scripts/download-code-debug.js\" \"tsc\"",
+    "build": "tsc",
     "watch": "tsc -w"
   },
   "theiaExtensions": [{
       "backend": "lib/node/cpp-debug-backend-module"
   }],
-  "debugAdapter": {
-    "downloadUrl": "https://github.com/marechal-p/code-debug/releases/download/v0.22.0/code-debug.tar.gz",
-    "dir": "lib/adapter"
+  "adapters": {
+    "code-debug": "https://github.com/marechal-p/code-debug/releases/download/v0.22.0/code-debug.tar.gz"
   }
 }

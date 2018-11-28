@@ -4,10 +4,9 @@
     "prepare": "lerna run prepare",
     "rebuild:browser": "theia rebuild:browser",
     "rebuild:electron": "theia rebuild:electron",
-    "watch": "lerna run watch --scope \"@theia/!(*-app)*\" --parallel"
+    "watch": "lerna run watch --parallel"
   },
   "devDependencies": {
-    "concurrently": "^3.5.0",
     "lerna": "2.4.0"
   },
   "workspaces": [
