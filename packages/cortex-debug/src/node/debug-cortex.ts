@@ -17,7 +17,7 @@
 import { injectable } from 'inversify';
 import { DebugConfiguration } from '@theia/debug/lib/common/debug-common';
 import { AbstractVSCodeDebugAdapterContribution } from '@theia/debug/lib/node/vscode/vscode-debug-adapter-contribution';
-import { join } from 'path';
+import { join, isAbsolute } from 'path';
 import { existsSync } from 'fs';
 
 const OPENOCD_VALID_RTOS: string[] = ['eCos', 'ThreadX', 'FreeRTOS', 'ChibiOS', 'embKernel', 'mqx', 'uCOS-III'];
@@ -46,7 +46,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
             throw new Error('Executable is not provided.');
         }
 
-        if (config.cwd) {
+        if (config.cwd && !isAbsolute(config.executable)) {
             config.executable = join(config.cwd, config.executable);
         }
 
