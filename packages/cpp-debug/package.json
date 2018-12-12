@@ -42,6 +42,6 @@
       "backend": "lib/node/cpp-debug-backend-module"
   }],
   "adapters": {
-    "code-debug": "https://github.com/marechal-p/code-debug/releases/download/v0.22.0/code-debug.tar.gz"
+    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.4/cdt-gdb-vscode-0.0.4.tgz"
   }
 }
