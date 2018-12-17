@@ -1,0 +1,96 @@
+.t-mv-container {
+    align-items: left;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 10px;
+}
+
+.t-mv-container > .t-mv-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.t-mv-container > .t-mv-header h1 {
+    align-self: center;
+    color: var(--theia-ui-font-color2);
+    font-size: 12px;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.t-mv-container > .t-mv-header #refresh-action,
+.t-mv-container > .t-mv-header #refresh-action i {
+    align-self: center;
+    color: var(--theia-ui-font-color2);
+    color: var(--theia-ui-font-color2);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.t-mv-container > .t-mv-search-container {
+    align-items: left;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.t-mv-container > .t-mv-search-container > .t-mv-search-label {
+    color: var(--theia-ui-font-color0);
+    font-size: var(--theia-ui-font-size0);
+    margin-bottom: 3px;
+    user-select: none;
+}
+
+.t-mv-search-container input[type="text"] {
+    color: var(--theia-ui-font-color1);
+    flex-basis: 100%;
+    flex: 1;
+    font-size: var(--theia-ui-font-size1);
+    line-height: var(--theia-content-line-height);
+    padding: 0px 8px 0px 8px;
+}
+
+#t-mv-search-view-container {
+    display: flex;
+    margin-top: 10px;
+}
+
+table#t-mv-search-view {
+    align-self: center;
+    border-collapse: collapse;
+    border: none;
+}
+
+table#t-mv-search-view,
+table#t-mv-search-view th
+table#t-mv-search-view td {
+    font-size: var(--theia-ui-font-size1);
+    font-weight: 400;
+    text-align: left;
+    padding: 10px;
+}
+
+table#t-mv-search-view td,
+table#t-mv-search-view th {
+    font-family: monospace;
+    color: var(--theia-ui-font-color0);
+    padding-right: 15px;
+}
+
+table#t-mv-search-view .t-mv-search-view-row:hover {
+    background-color: var(--theia-layout-color2);
+}
+
+table#t-mv-search-view .t-mv-header-label{
+    background-color: var(--theia-layout-color2);
+    border-radius: 10px;
+    color: var(--theia-ui-font-color1);
+    font-weight: 400;
+    padding: 2px 5px 2px 5px;
+}
+
+table#t-mv-search-view .t-mv-search-view-address {
+    color: var(--theia-brand-color1);
+    font-weight: 700;
+    text-align: center;
+}
