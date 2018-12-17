@@ -39,6 +39,7 @@
     "watch": "tsc -w"
   },
   "theiaExtensions": [{
+      "frontend": "lib/browser/cpp-debug-frontend-module",
       "backend": "lib/node/cpp-debug-backend-module"
   }],
   "adapters": {
