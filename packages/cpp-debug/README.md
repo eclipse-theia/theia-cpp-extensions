@@ -1,6 +1,7 @@
 This extension contributes debugging support to Theia for C/C++ using
 [GDB](https://www.gnu.org/software/gdb/) through the
-[cdt-gdb-vscode](https://github.com/eclipse-cdt/cdt-gdb-vscode) debug adapter.
+[cdt-gdb-vscode](https://github.com/eclipse-cdt/cdt-gdb-vscode) VS Code
+extension.
 
 Here's how a simple debug launch config in `.theia/launch.json` may look like:
 
