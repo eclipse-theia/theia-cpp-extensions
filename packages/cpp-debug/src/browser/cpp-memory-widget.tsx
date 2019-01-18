@@ -1,12 +1,29 @@
 import * as React from 'react';
-import { injectable, postConstruct } from 'inversify';
+import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
+import { MemoryProvider } from './memory-provider';
+
+/**
+ * Return true if `byte` represents a printable ASCII character.
+ */
+function isprint(byte: number) {
+    return byte >= 32 && byte < 127;
+}
 
 @injectable()
 export class MemoryView extends ReactWidget {
 
     static readonly ID = 'memory.view';
     static readonly LABEL = 'Memory';
+    static readonly BYTES_PER_ROW = 16;
+
+    protected startAddress: number = 0;
+    protected bytes: Uint8Array | undefined = undefined;
+    // If bytes is undefined, this string explains why.
+    protected memoryReadError: string = 'Nothing to see here.';
+
+    @inject(MemoryProvider)
+    protected readonly memoryProvider!: MemoryProvider;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -22,7 +39,7 @@ export class MemoryView extends ReactWidget {
         this.focusSearchField();
     }
 
-    protected findSearchField(): HTMLInputElement | null {
+    protected findSearchField(): HTMLInputElement | undefined {
         return document.getElementById('t-mv-search') as HTMLInputElement;
     }
 
@@ -54,12 +71,19 @@ export class MemoryView extends ReactWidget {
     protected renderSearchField(): React.ReactNode {
         return <div className='t-mv-search-container'>
             <div className='label t-mv-search-label'>Memory Address</div>
-            <input id='t-mv-search' type='text' />
+            <input id='t-mv-search' type='text' onKeyUp={this.doRefresh} />
         </div>;
     }
 
     protected renderView(): React.ReactNode {
-        const rows = this.renderViewRows();
+        if (this.bytes === undefined) {
+            const style = {
+                color: '#f5f5f5'
+            };
+            return <span style={style}>{this.memoryReadError}</span>;
+        }
+
+        const rows = this.renderViewRows(this.bytes);
         return <div id='t-mv-search-view-container'>
             <table id='t-mv-search-view'>
                 <thead>
@@ -71,7 +95,7 @@ export class MemoryView extends ReactWidget {
                             <span className='t-mv-header-label'>Data</span>
                         </th>
                         <th>
-                            <span className='t-mv-header-label'>Code</span>
+                            <span className='t-mv-header-label'>ASCII</span>
                         </th>
                     </tr>
                 </thead>
@@ -82,30 +106,66 @@ export class MemoryView extends ReactWidget {
         </div>
     }
 
-    protected renderViewRows(): React.ReactNode {
-        const items = [
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-            ['oX100001', '0000 0000 0000 0000 0000 0000 0000 0001', '..x...x..x...x..x...x'],
-        ]
+    protected renderViewRows(bytes: Uint8Array): React.ReactNode {
+        const rows: string[][] = [];
+
+        // For each row...
+        for (let offset = 0; offset < bytes.length; offset += MemoryView.BYTES_PER_ROW) {
+            // Bytes shown in this row.
+            const rowBytes = bytes.subarray(offset, offset + MemoryView.BYTES_PER_ROW);
+
+            const addressStr = '0x' + (this.startAddress + offset).toString(16);
+            let rowBytesStr = '';
+            let asciiStr = '';
+
+            // For each byte in the row...
+            for (const byte of rowBytes) {
+                const byteStr = byte.toString(16);
+                if (byteStr.length == 1) {
+                    rowBytesStr += '0';
+                }
+
+                rowBytesStr += byteStr + ' ';
+                asciiStr += isprint(byte) ? String.fromCharCode(byte) : '.';
+            }
+
+            rows.push([addressStr, rowBytesStr, asciiStr])
+        }
+
         return <React.Fragment>
             {
-                items.map((item, index) =>
+                rows.map((row, index) =>
                     <tr className='t-mv-search-view-row' key={index}>
-                        <td className='t-mv-search-view-address'>{item[0]}</td>
-                        <td className='t-mv-search-view-data'>{item[1]}</td>
-                        <td className='t-mv-search-view-code'>{item[2]}</td>
+                        <td className='t-mv-search-view-address'>{row[0]}</td>
+                        <td className='t-mv-search-view-data'>{row[1]}</td>
+                        <td className='t-mv-search-view-code'>{row[2]}</td>
                     </tr>
                 )
             }
         </React.Fragment>;
     }
 
-    protected doRefresh = () => { return };
+    protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        const field = this.findSearchField();
+        if (field === undefined) {
+            return;
+        }
+
+        this.startAddress = parseInt(field.value, 16);
+        this.memoryProvider.readMemory(this.startAddress, 128)
+            .then(bytes => {
+                this.bytes = bytes;
+                this.update();
+            }).catch(err => {
+                console.error('Failed to read memory', err);
+                this.memoryReadError = err.message;
+                this.bytes = undefined;
+                this.update();
+            });
+
+    };
 }
