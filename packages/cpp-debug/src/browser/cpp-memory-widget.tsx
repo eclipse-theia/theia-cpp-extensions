@@ -15,9 +15,9 @@
  ********************************************************************************/
 
 import * as React from 'react';
+import { MemoryProvider } from './memory-provider';
 import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
-import { MemoryProvider } from './memory-provider';
 
 /**
  * Return true if `byte` represents a printable ASCII character.
@@ -36,7 +36,7 @@ export class MemoryView extends ReactWidget {
     protected startAddress: number = 0;
     protected bytes: Uint8Array | undefined = undefined;
     // If bytes is undefined, this string explains why.
-    protected memoryReadError: string = 'Nothing to see here.';
+    protected memoryReadError: string = 'No memory address information currently available.';
 
     @inject(MemoryProvider)
     protected readonly memoryProvider!: MemoryProvider;
@@ -70,7 +70,8 @@ export class MemoryView extends ReactWidget {
     protected render(): React.ReactNode {
         return <div className='t-mv-container'>
             {this.renderHeader()}
-            {this.renderSearchField()}
+            {this.renderInputContainer()}
+            <hr id='t-mv-input-container-seperator' />
             {this.renderView()}
         </div>;
     }
@@ -84,24 +85,46 @@ export class MemoryView extends ReactWidget {
         </div>;
     }
 
-    protected renderSearchField(): React.ReactNode {
-        return <div className='t-mv-search-container'>
-            <div className='label t-mv-search-label'>Memory Address</div>
-            <input id='t-mv-search' type='text' onKeyUp={this.doRefresh} />
-        </div>;
+    protected renderInputContainer(): React.ReactNode {
+        return <div id='t-mv-wrapper'>
+            <div className='t-mv-group'>
+                <span className='t-mv-input-group'>
+                    <label className='t-mv-label'>Memory Address</label>
+                    <input className='t-mv-input' id='t-mv-search' placeholder='Memory Address' type='text' onKeyUp={this.doRefresh} />
+                </span>
+                <span className='t-mv-input-group'>
+                    <label className='t-mv-label'>Bytes Per Row</label>
+                    <select className='t-mv-input' id='t-mv-bytesrow' defaultValue='1'>
+                        <option value='0'>8</option>
+                        <option value='1'>16</option>
+                    </select>
+                </span>
+                <span className='t-mv-input-group'>
+                    <label className='t-mv-label'>Bytes Per Group</label>
+                    <select className='t-mv-input' id='t-mv-bytesgroup' defaultValue='0'>
+                        <option value='0'>8</option>
+                        <option value='1'>16</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+    }
+
+    protected renderErrorMessage(msg: string): React.ReactNode {
+        return <div className='t-mv-error'>
+            <i className='fa fa-warning t-mv-error-icon'></i>
+            {msg}
+        </div>
     }
 
     protected renderView(): React.ReactNode {
         if (this.bytes === undefined) {
-            const style = {
-                color: '#f5f5f5'
-            };
-            return <span style={style}>{this.memoryReadError}</span>;
+            return this.renderErrorMessage(this.memoryReadError);
         }
 
         const rows = this.renderViewRows(this.bytes);
-        return <div id='t-mv-search-view-container'>
-            <table id='t-mv-search-view'>
+        return <div id='t-mv-view-container'>
+            <table id='t-mv-view'>
                 <thead>
                     <tr>
                         <th>
@@ -151,10 +174,10 @@ export class MemoryView extends ReactWidget {
         return <React.Fragment>
             {
                 rows.map((row, index) =>
-                    <tr className='t-mv-search-view-row' key={index}>
-                        <td className='t-mv-search-view-address'>{row[0]}</td>
-                        <td className='t-mv-search-view-data'>{row[1]}</td>
-                        <td className='t-mv-search-view-code'>{row[2]}</td>
+                    <tr className='t-mv-view-row' key={index}>
+                        <td className='t-mv-view-address'>{row[0]}</td>
+                        <td className='t-mv-view-data'>{row[1]}</td>
+                        <td className='t-mv-view-code'>{row[2]}</td>
                     </tr>
                 )
             }
@@ -184,4 +207,5 @@ export class MemoryView extends ReactWidget {
             });
 
     };
+
 }

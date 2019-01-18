@@ -42,61 +42,72 @@
     font-size: 12px;
 }
 
-.t-mv-container > .t-mv-search-container {
-    align-items: left;
+#t-mv-input-container-seperator {
+    border: 1px solid var(--theia-layout-color2);
+    margin-top: 15px;
+}
+
+.t-mv-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: wrap;
+    align-items: flex-start;
 }
 
-.t-mv-container > .t-mv-search-container > .t-mv-search-label {
+.t-mv-input-group {
+    align-self: center;
+    margin: 2px;
+    margin-right: 20px;
+    flex-shrink: 2;
+}
+
+.t-mv-input-group .t-mv-input {
+    border-radius: 5px;
+    flex-basis: 0;
+}
+
+.t-mv-label {
     color: var(--theia-ui-font-color0);
-    font-size: var(--theia-ui-font-size0);
-    margin-bottom: 3px;
-    user-select: none;
+    margin-right: 10px;
 }
 
-.t-mv-search-container input[type="text"] {
-    color: var(--theia-ui-font-color1);
-    flex-basis: 100%;
-    flex: 1;
-    font-size: var(--theia-ui-font-size1);
-    line-height: var(--theia-content-line-height);
-    padding: 0px 8px 0px 8px;
+.t-mv-error {
+    color: var(--theia-ui-font-color0);
+    padding: 10px 0px 10px 0px;
 }
 
-#t-mv-search-view-container {
-    display: flex;
-    margin-top: 10px;
+.t-mv-error-icon {
+    color: var(--theia-warn-color0);
+    padding-right: 4px;
 }
 
-table#t-mv-search-view {
+table#t-mv-view {
     align-self: center;
     border-collapse: collapse;
     border: none;
 }
 
-table#t-mv-search-view,
-table#t-mv-search-view th
-table#t-mv-search-view td {
+table#t-mv-view,
+table#t-mv-view th
+table#t-mv-view td {
     font-size: var(--theia-ui-font-size1);
     font-weight: 400;
     text-align: left;
     padding: 10px;
 }
 
-table#t-mv-search-view td,
-table#t-mv-search-view th {
+table#t-mv-view td,
+table#t-mv-view th {
     font-family: monospace;
     color: var(--theia-ui-font-color0);
     padding-right: 15px;
 }
 
-table#t-mv-search-view .t-mv-search-view-row:hover {
+table#t-mv-view .t-mv-view-row:hover {
     background-color: var(--theia-layout-color2);
 }
 
-table#t-mv-search-view .t-mv-header-label{
+table#t-mv-view .t-mv-header-label{
     background-color: var(--theia-layout-color2);
     border-radius: 10px;
     color: var(--theia-ui-font-color1);
@@ -104,7 +115,7 @@ table#t-mv-search-view .t-mv-header-label{
     padding: 2px 5px 2px 5px;
 }
 
-table#t-mv-search-view .t-mv-search-view-address {
+table#t-mv-view .t-mv-view-address {
     color: var(--theia-brand-color1);
     font-weight: 700;
     text-align: center;
