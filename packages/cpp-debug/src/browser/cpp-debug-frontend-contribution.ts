@@ -13,7 +13,7 @@ export class CppContribution extends AbstractViewContribution<MemoryView> {
             widgetId: MemoryView.ID,
             widgetName: MemoryView.LABEL,
             defaultWidgetOptions: {
-                area: 'left'
+                area: 'bottom'
             },
             toggleCommandId: MemoryCommand.id,
         });
