@@ -18,8 +18,8 @@
     "@theia/messages": "next",
     "@theia/json": "next",
     "@theia/cpp": "next",
-    "@theia/cortex-debug": "0.3.16",
-    "@theia/cpp-debug": "0.3.16"
+    "@theia/cortex-debug": "0.3.19",
+    "@theia/cpp-debug": "0.3.19"
   },
   "devDependencies": {
     "@theia/cli": "next"

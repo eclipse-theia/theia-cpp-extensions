@@ -14,7 +14,7 @@
   "keywords": [
     "theia-extension", "cpp", "debug"
   ],
-  "version": "0.3.16",
+  "version": "0.3.19",
   "files": [
     "data",
     "lib",
@@ -32,8 +32,9 @@
     "zlib": "^1.0.5"
   },
   "scripts": {
-    "postinstall": "node ./scripts/download-adapters.js",
+    "postinstall": "yarn run download",
     "prepare": "yarn run clean && yarn run build",
+    "download": "download-debug-adapters",
     "clean": "rimraf lib",
     "build": "tsc",
     "watch": "tsc -w"
