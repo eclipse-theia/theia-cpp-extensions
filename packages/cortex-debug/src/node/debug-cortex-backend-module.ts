@@ -16,7 +16,7 @@
 
 import { ContainerModule } from 'inversify';
 import { CortexDebugAdapterContribution } from './debug-cortex';
-import { DebugAdapterContribution } from '@theia/debug/lib/node/debug-model';
+import { DebugAdapterContribution } from '@theia/debug/lib/common/debug-model';
 
 export default new ContainerModule(bind => {
     bind(DebugAdapterContribution).to(CortexDebugAdapterContribution).inSingletonScope();

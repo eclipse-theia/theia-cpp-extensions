@@ -41,7 +41,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
     constructor() {
         super(
             'cortex-debug',
-            join(__dirname, '../../adapters/cortex-debug/extension')
+            join(__dirname, '../../download/cortex-debug/extension')
         );
     }
 
