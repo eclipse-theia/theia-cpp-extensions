@@ -21,30 +21,13 @@
     padding: 10px;
 }
 
-.t-mv-container > .t-mv-header {
-    display: flex;
-    justify-content: space-between;
-}
-
-.t-mv-container > .t-mv-header h1 {
-    align-self: center;
-    color: var(--theia-ui-font-color2);
-    font-size: 12px;
-    font-weight: 400;
-    text-transform: uppercase;
-}
-
-.t-mv-container > .t-mv-header #refresh-action,
-.t-mv-container > .t-mv-header #refresh-action i {
-    align-self: center;
-    color: var(--theia-ui-font-color2);
-    cursor: pointer;
-    font-size: 12px;
-}
-
 #t-mv-input-container-seperator {
     border: 1px solid var(--theia-layout-color2);
-    margin-top: 15px;
+    margin-top: 10px;
+}
+
+#t-mv-search {
+    font-family: monospace;
 }
 
 .t-mv-group {
@@ -79,6 +62,15 @@
 .t-mv-error-icon {
     color: var(--theia-warn-color0);
     padding-right: 4px;
+}
+
+.t-mv-radio-label {
+    color: var(--theia-ui-font-color0);
+    margin-right: 10px;
+}
+
+.t-mv-container input[type="radio"]{
+    vertical-align: text-bottom;
 }
 
 table#t-mv-view {
