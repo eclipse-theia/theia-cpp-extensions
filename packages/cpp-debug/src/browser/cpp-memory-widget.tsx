@@ -250,7 +250,7 @@ export class MemoryView extends ReactWidget {
             // Bytes shown in this row.
             const rowBytes = result.bytes.subarray(rowOffset, rowOffset + this.bytesPerRow);
 
-            const addressStr = '0x' + (result.address + rowOffset).toString(16);
+            const addressStr = '0x' + (result.address.add(rowOffset)).toString(16);
             let rowBytesStr = '';
             let asciiStr = '';
 

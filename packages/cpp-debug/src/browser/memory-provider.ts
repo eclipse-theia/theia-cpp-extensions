@@ -16,10 +16,12 @@
 
 import { injectable, inject } from "inversify";
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
+import * as Long from 'long';
+import { hexStrToUnsignedLong } from "../common/util";
 
 export interface MemoryReadResult {
     bytes: Uint8Array,
-    address: number,
+    address: Long,
 }
 
 export const MemoryProvider = Symbol('MemoryProvider');
@@ -67,7 +69,7 @@ export class MemoryProviderImpl implements MemoryProvider {
         });
 
         const bytes = hex2bytes(result.body.data);
-        const address = parseInt(result.body.address, 16);
+        const address = hexStrToUnsignedLong(result.body.address);
 
         return {
             bytes: bytes,

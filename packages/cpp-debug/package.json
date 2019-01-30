@@ -22,7 +22,8 @@
   ],
   "dependencies": {
     "@theia/core": "next",
-    "@theia/debug": "next"
+    "@theia/debug": "next",
+    "long": "^4.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
