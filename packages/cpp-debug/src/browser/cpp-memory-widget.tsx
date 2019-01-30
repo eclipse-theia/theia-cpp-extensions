@@ -15,7 +15,7 @@
  ********************************************************************************/
 
 import * as React from 'react';
-import { MemoryProvider } from './memory-provider';
+import { MemoryProvider, MemoryReadResult } from './memory-provider';
 import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
 
@@ -99,8 +99,7 @@ export class MemoryView extends ReactWidget {
     static readonly BIG_ENDIAN_BUTTON_ID = "t-mv-big-endian";
     static readonly ENDIANNESS_BUTTONS_NAME = "t-mv-endianness";
 
-    protected startAddress: number = 0;
-    protected bytes: Uint8Array | undefined = undefined;
+    protected memoryReadResult: MemoryReadResult | undefined = undefined;
     // If bytes is undefined, this string explains why.
     protected memoryReadError: string = 'No memory contents currently available.';
 
@@ -216,11 +215,11 @@ export class MemoryView extends ReactWidget {
     }
 
     protected renderView(): React.ReactNode {
-        if (this.bytes === undefined) {
+        if (this.memoryReadResult === undefined) {
             return this.renderErrorMessage(this.memoryReadError);
         }
 
-        const rows = this.renderViewRows(this.bytes);
+        const rows = this.renderViewRows(this.memoryReadResult);
         return <div id='t-mv-view-container'>
             <table id='t-mv-view'>
                 <thead>
@@ -243,15 +242,15 @@ export class MemoryView extends ReactWidget {
         </div>
     }
 
-    protected renderViewRows(bytes: Uint8Array): React.ReactNode {
+    protected renderViewRows(result: MemoryReadResult): React.ReactNode {
         const rows: string[][] = [];
 
         // For each row...
-        for (let rowOffset = 0; rowOffset < bytes.length; rowOffset += this.bytesPerRow) {
+        for (let rowOffset = 0; rowOffset < result.bytes.length; rowOffset += this.bytesPerRow) {
             // Bytes shown in this row.
-            const rowBytes = bytes.subarray(rowOffset, rowOffset + this.bytesPerRow);
+            const rowBytes = result.bytes.subarray(rowOffset, rowOffset + this.bytesPerRow);
 
-            const addressStr = '0x' + (this.startAddress + rowOffset).toString(16);
+            const addressStr = '0x' + (result.address + rowOffset).toString(16);
             let rowBytesStr = '';
             let asciiStr = '';
 
@@ -308,15 +307,14 @@ export class MemoryView extends ReactWidget {
             return;
         }
 
-        this.startAddress = parseInt(field.value, 16);
-        this.memoryProvider.readMemory(this.startAddress, 128)
-            .then(bytes => {
-                this.bytes = bytes;
+        this.memoryProvider.readMemory(field.value, 128)
+            .then(result => {
+                this.memoryReadResult = result;
                 this.update();
             }).catch(err => {
                 console.error('Failed to read memory', err);
                 this.memoryReadError = err.message;
-                this.bytes = undefined;
+                this.memoryReadResult = undefined;
                 this.update();
             });
     };
