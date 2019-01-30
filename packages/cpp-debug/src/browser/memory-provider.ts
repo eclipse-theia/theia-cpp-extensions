@@ -17,9 +17,18 @@
 import { injectable, inject } from "inversify";
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
 
+export interface MemoryReadResult {
+    bytes: Uint8Array,
+    address: number,
+}
+
 export const MemoryProvider = Symbol('MemoryProvider');
 export interface MemoryProvider {
-    readMemory(address: number, length: number): Promise<Uint8Array>;
+    /**
+     * Read `number` bytes of memory at address `location`, which can be
+     * any expression evaluating to an address.
+     */
+    readMemory(location: string, length: number): Promise<MemoryReadResult>;
 }
 
 /**
@@ -46,17 +55,23 @@ export class MemoryProviderImpl implements MemoryProvider {
     @inject(DebugSessionManager)
     protected readonly debugSessionManager!: DebugSessionManager;
 
-    async readMemory(address: number, length: number): Promise<Uint8Array> {
+    async readMemory(location: string, length: number): Promise<MemoryReadResult> {
         const session = this.debugSessionManager.currentSession;
         if (session === undefined) {
             throw new Error('No active debug session.');
         }
 
         const result = await session.sendCustomRequest('cdt-gdb-adapter/Memory', {
-            address,
-            length,
+            address: location,
+            length: length,
         });
 
-        return hex2bytes(result.body.data);
+        const bytes = hex2bytes(result.body.data);
+        const address = parseInt(result.body.address, 16);
+
+        return {
+            bytes: bytes,
+            address: address,
+        };
     }
 }
