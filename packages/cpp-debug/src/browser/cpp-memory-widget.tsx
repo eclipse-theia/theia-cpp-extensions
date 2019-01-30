@@ -15,9 +15,14 @@
  ********************************************************************************/
 
 import * as React from 'react';
-import { MemoryProvider, MemoryReadResult } from './memory-provider';
+import { MemoryProvider, VariableRange, MemoryReadResult } from './memory-provider';
 import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
+import * as Long from 'long';
+import { DebugSession } from '@theia/debug/lib/browser/debug-session';
+import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
+import { DebugVariable } from '@theia/debug/lib/browser/console/debug-console-items';
+import { hexStrToUnsignedLong } from '../common/util';
 
 /**
  * Return true if `byte` represents a printable ASCII character.
@@ -34,57 +39,95 @@ function isValidEndianness(val: string): val is Endianness {
     return val == 'le' || val == 'be';
 }
 
+interface IndexAndByte {
+    // Index of the byte in the byte array.
+    idx: number;
+
+    // Value of the byte, [0-255].
+    byte: number;
+}
+
 /**
  * Iterators to be able to iterate forward and backwards on byte arrays.
  */
-class ForwardIterator implements Iterator<number> {
-    private nextItem: number = 0;
+class BigEndianByteIterator implements Iterator<IndexAndByte> {
+    private nextIndex: number = 0;
 
     constructor(private array: Uint8Array) { }
 
-    next(): IteratorResult<number> {
-        if (this.nextItem < this.array.length) {
+    next(): IteratorResult<IndexAndByte> {
+        if (this.nextIndex < this.array.length) {
+            const thisIndex = this.nextIndex++;
             return {
-                value: this.array[this.nextItem++],
+                value: {
+                    idx: thisIndex,
+                    byte: this.array[thisIndex],
+                },
                 done: false,
             }
         } else {
             return {
                 done: true,
-                value: 0,
+                value: {
+                    idx: -1,
+                    byte: 0,
+                },
             };
         }
     }
 
-    [Symbol.iterator](): IterableIterator<number> {
+    [Symbol.iterator](): IterableIterator<IndexAndByte> {
         return this;
     }
 }
 
-class ReverseIterator implements Iterator<number> {
-    private nextItem: number;
+class LittleEndianByteIterator implements Iterator<IndexAndByte> {
+    private nextIndex: number;
 
     constructor(private array: Uint8Array) {
-        this.nextItem = this.array.length - 1;
+        this.nextIndex = this.array.length - 1;
     }
 
-    next(): IteratorResult<number> {
-        if (this.nextItem >= 0) {
+    next(): IteratorResult<IndexAndByte> {
+        if (this.nextIndex >= 0) {
+            const thisIndex = this.nextIndex--;
             return {
-                value: this.array[this.nextItem--],
+                value: {
+                    idx: thisIndex,
+                    byte: this.array[thisIndex],
+                },
                 done: false,
             }
         } else {
             return {
                 done: true,
-                value: 0,
+                value: {
+                    idx: -1,
+                    byte: 0,
+                },
             };
         }
     }
 
-    [Symbol.iterator](): IterableIterator<number> {
+    [Symbol.iterator](): IterableIterator<IndexAndByte> {
         return this;
     }
+}
+
+/**
+ * Check if the address `byteAddress` is located within the range of one of
+ * the variables of `variables`.  Return the index of the variable which
+ * matches.
+ */
+function isInVariable(byteAddress: Long, variables: VariableRange[]): number {
+    for (let i = 0; i < variables.length; i++) {
+        const variable = variables[i];
+        if (byteAddress.ge(variable.address) && byteAddress.lt(variable.pastTheEndAddress)) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 @injectable()
@@ -105,6 +148,9 @@ export class MemoryView extends ReactWidget {
     // If bytes is undefined, this string explains why.
     protected memoryReadError: string = 'No memory contents currently available.';
 
+    // Details about the current local variables.
+    protected variables: VariableRange[] | undefined = undefined;
+
     // Parameters for the rendering of the memory contents.
     protected bytesPerRow: number = 16;
     protected bytesPerGroup: number = 1;
@@ -112,6 +158,9 @@ export class MemoryView extends ReactWidget {
 
     @inject(MemoryProvider)
     protected readonly memoryProvider!: MemoryProvider;
+
+    @inject(DebugSessionManager)
+    protected readonly debugSessionManager!: DebugSessionManager;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -250,7 +299,7 @@ export class MemoryView extends ReactWidget {
             return this.renderErrorMessage(this.memoryReadError);
         }
 
-        const rows = this.renderViewRows(this.memoryReadResult);
+        const rows = this.renderViewRows(this.memoryReadResult, this.variables || []);
         return <div id='t-mv-view-container'>
             <table id='t-mv-view'>
                 <thead>
@@ -273,38 +322,63 @@ export class MemoryView extends ReactWidget {
         </div>
     }
 
-    protected renderViewRows(result: MemoryReadResult): React.ReactNode {
-        const rows: string[][] = [];
+    protected renderViewRows(result: MemoryReadResult, variables: VariableRange[]): React.ReactNode {
+        interface RenderRow {
+            address: string;
+            nodes: React.ReactNode;
+            ascii: string;
+        }
+        const rows: RenderRow[] = [];
+        const pastTheEndAddress = result.address.add(result.bytes.length);
+
+        // Filter down to variables that are in the scope of what we're showing in the
+        // memory view.
+        const variablesInRange = variables.filter(variable => {
+            const isBefore = variable.pastTheEndAddress.le(result.address);
+            const isAfter = variable.address.ge(pastTheEndAddress);
+            return !(isBefore || isAfter);
+        }).sort((first, second) => first.address.compare(second.address));
 
         // For each row...
         for (let rowOffset = 0; rowOffset < result.bytes.length; rowOffset += this.bytesPerRow) {
             // Bytes shown in this row.
             const rowBytes = result.bytes.subarray(rowOffset, rowOffset + this.bytesPerRow);
 
-            const addressStr = '0x' + (result.address.add(rowOffset)).toString(16);
-            let rowBytesStr = '';
+            const rowAddress = result.address.add(rowOffset);
+            const addressStr = '0x' + rowAddress.toString(16);
+            let rowNodes: React.ReactNode[] = [];
             let asciiStr = '';
 
             // For each byte group in the row...
             for (let groupOffset = 0; groupOffset < rowBytes.length; groupOffset += this.bytesPerGroup) {
                 // Bytes shown in this group.
+                const groupAddress = rowAddress.add(groupOffset);
                 const groupBytes = rowBytes.subarray(groupOffset, groupOffset + this.bytesPerGroup);
-
-                let groupStr = '';
-
-                const iteratorType = this.endianness == 'be' ? ForwardIterator : ReverseIterator;
+                const iteratorType = this.endianness == 'be' ? BigEndianByteIterator : LittleEndianByteIterator;
 
                 // For each byte in the group
-                for (const byte of new iteratorType(groupBytes)) {
-                    const byteStr = byte.toString(16);
+                for (const item of new iteratorType(groupBytes)) {
+                    let byteStr = item.byte.toString(16);
                     if (byteStr.length == 1) {
-                        groupStr += '0';
+                        byteStr = '0' + byteStr;
                     }
 
-                    groupStr += byteStr;
+                    const byteAddress = groupAddress.add(item.idx);
+                    const inVariableIdx = isInVariable(byteAddress, variablesInRange);
+
+                    // If this byte is part of a local variable, highlight it.
+                    if (inVariableIdx >= 0) {
+                        const hue = 360 * (inVariableIdx / variablesInRange.length);
+                        const props: React.CSSProperties = {
+                            color: `hsl(${hue}, 60%, 60%)`,
+                        };
+                        rowNodes.push(<span style={props} title={variablesInRange[inVariableIdx].name}>{byteStr}</span>);
+                    } else {
+                        rowNodes.push(<span>{byteStr}</span>);
+                    }
                 }
 
-                rowBytesStr += groupStr + ' ';
+                rowNodes.push(<span>&nbsp;</span>);
 
                 // The ASCII view is always in strictly increasing address order.
                 for (const byte of groupBytes) {
@@ -312,58 +386,60 @@ export class MemoryView extends ReactWidget {
                 }
             }
 
-            rows.push([addressStr, rowBytesStr, asciiStr])
+            rows.push({
+                address: addressStr,
+                nodes: rowNodes,
+                ascii: asciiStr,
+            });
         }
 
         return <React.Fragment>
             {
                 rows.map((row, index) =>
                     <tr className='t-mv-view-row' key={index}>
-                        <td className='t-mv-view-address'>{row[0]}</td>
-                        <td className='t-mv-view-data'>{row[1]}</td>
-                        <td className='t-mv-view-code'>{row[2]}</td>
+                        <td className='t-mv-view-address'>{row.address}</td>
+                        <td className='t-mv-view-data'>{row.nodes}</td>
+                        <td className='t-mv-view-code'>{row.ascii}</td>
                     </tr>
                 )
             }
         </React.Fragment>;
     }
 
-    protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
-        if ('key' in event && event.key !== 'Enter') {
-            return;
-        }
+    protected doRefresh = async (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+        try {
+            if ('key' in event && event.key !== 'Enter') {
+                return;
+            }
 
-        // Remove results from previous run.
-        this.memoryReadResult = undefined;
+            // Remove results from previous run.
+            this.memoryReadResult = undefined;
 
-        const locationField = this.findLocationField();
-        const lengthField = this.findLengthField();
-        if (locationField === undefined || lengthField === undefined) {
-            return;
-        }
+            const locationField = this.findLocationField();
+            const lengthField = this.findLengthField();
+            if (locationField === undefined || lengthField === undefined) {
+                return;
+            }
 
-        if (locationField.value.length == 0) {
-            this.memoryReadError = 'Enter an address or expression in the Location field.';
+            if (locationField.value.length == 0) {
+                throw new Error('Enter an address or expression in the Location field.');
+            }
+
+            if (lengthField.value.length == 0) {
+                throw new Error('Enter a length (decimal or hexadecimal number) in the Length field.');
+            }
+
+            this.memoryReadResult = await this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value));
+            this.variables = await getLocals(this.debugSessionManager.currentSession);
             this.update();
-            return
-        }
+        } catch (err) {
+            console.error('Failed to read memory', err);
+            this.memoryReadError = err.message;
 
-        if (lengthField.value.length == 0) {
-            this.memoryReadError = 'Enter a length (decimal or hexadecimal number) in the Length field.';
+            this.memoryReadResult = undefined;
+            this.variables = undefined;
             this.update();
-            return
         }
-
-        this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value))
-            .then(result => {
-                this.memoryReadResult = result;
-                this.update();
-            }).catch(err => {
-                console.error('Failed to read memory', err);
-                this.memoryReadError = err.message;
-                this.memoryReadResult = undefined;
-                this.update();
-            });
     };
 
     // Callbacks for when the various view parameters change.
@@ -389,4 +465,63 @@ export class MemoryView extends ReactWidget {
         }
         this.update();
     }
+}
+
+/**
+ * Get the local variables of the currently selected frame.
+ */
+async function getLocals(session: DebugSession | undefined): Promise<VariableRange[]> {
+    if (session === undefined) {
+        console.warn('No active debug session.');
+        return [];
+    }
+
+    const frame = session.currentFrame;
+    if (frame === undefined) {
+        throw new Error('No active stack frame.');
+    }
+
+    const ranges: VariableRange[] = [];
+
+    const scopes = await frame.getScopes();
+    for (const scope of scopes) {
+        const variables = await scope.getElements();
+        for (const v of variables) {
+            if (v instanceof DebugVariable) {
+                const addrExp = `&${v.name}`;
+                const sizeExp = `sizeof(${v.name})`;
+                const addrResp = await session.sendRequest('evaluate', {
+                    expression: addrExp,
+                    context: 'watch',
+                    frameId: frame.raw.id,
+                });
+                const sizeResp = await session.sendRequest('evaluate', {
+                    expression: sizeExp,
+                    context: 'watch',
+                    frameId: frame.raw.id,
+                });
+
+                // Make sure the address is in the format we expect.
+                if (!/^0x[0-9a-fA-F]+$/.test(addrResp.body.result)) {
+                    continue;
+                }
+
+                if (!/^[0-9]+$/.test(sizeResp.body.result)) {
+                    continue;
+                }
+
+                const size = parseInt(sizeResp.body.result);
+                const address = hexStrToUnsignedLong(addrResp.body.result);
+                const pastTheEndAddress = address.add(size);
+
+                ranges.push({
+                    name: v.name,
+                    address: address,
+                    pastTheEndAddress: pastTheEndAddress,
+                });
+            }
+        }
+    }
+
+    return ranges;
 }

@@ -33,6 +33,12 @@ export interface MemoryProvider {
     readMemory(location: string, length: number): Promise<MemoryReadResult>;
 }
 
+export interface VariableRange {
+    name: string;
+    address: Long;
+    pastTheEndAddress: Long;
+}
+
 /**
  * Convert an hex-encoded string of bytes to the Uint8Array equivalent.
  */
