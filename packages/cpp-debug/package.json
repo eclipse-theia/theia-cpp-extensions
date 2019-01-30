@@ -22,9 +22,14 @@
   ],
   "dependencies": {
     "@theia/core": "next",
-    "@theia/debug": "next"
+    "@theia/debug": "next",
+    "long": "^4.0.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.0",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
     "rimraf": "^2.6.2",
     "tar": "^4.0.0",
     "typescript": "^3",
@@ -37,7 +42,8 @@
     "download": "download-debug-adapters",
     "clean": "rimraf lib",
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "test": "mocha \"lib/**/*.spec.js\""
   },
   "theiaExtensions": [{
       "frontend": "lib/browser/cpp-debug-frontend-module",
