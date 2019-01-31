@@ -44,6 +44,6 @@
       "backend": "lib/node/cpp-debug-backend-module"
   }],
   "adapters": {
-    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.34/cdt-gdb-vscode-0.0.34.tgz"
+    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.61/cdt-gdb-vscode-0.0.61.tgz"
   }
 }
