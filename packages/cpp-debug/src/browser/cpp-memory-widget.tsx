@@ -93,6 +93,8 @@ export class MemoryView extends ReactWidget {
     static readonly ID = 'memory.view';
     static readonly LABEL = 'Memory';
 
+    static readonly LOCATION_FIELD_ID = 't-mv-location';
+    static readonly LENGTH_FIELD_ID = 't-mv-length';
     static readonly BYTES_PER_ROW_FIELD_ID = 't-mv-bytesrow';
     static readonly BYTES_PER_GROUP_FIELD_ID = 't-mv-bytesgroup';
     static readonly LITTLE_ENDIAN_BUTTON_ID = "t-mv-little-endian";
@@ -122,15 +124,28 @@ export class MemoryView extends ReactWidget {
 
     protected onActivateRequest(msg: Message): void {
         super.onActivateRequest(msg);
-        this.focusSearchField();
+        this.focusLocationField();
     }
 
-    protected findSearchField(): HTMLInputElement | undefined {
-        return document.getElementById('t-mv-search') as HTMLInputElement;
+    protected findField(id: string): HTMLInputElement | undefined {
+        const field = document.getElementById(id);
+        if (field === null) {
+            return undefined;
+        }
+
+        return field as HTMLInputElement;
     }
 
-    protected focusSearchField(): void {
-        const input = this.findSearchField();
+    protected findLocationField(): HTMLInputElement | undefined {
+        return this.findField(MemoryView.LOCATION_FIELD_ID);
+    }
+
+    protected findLengthField(): HTMLInputElement | undefined {
+        return this.findField(MemoryView.LENGTH_FIELD_ID);
+    }
+
+    protected focusLocationField(): void {
+        const input = this.findLocationField();
         if (input) {
             (input as HTMLInputElement).focus();
             (input as HTMLInputElement).select();
@@ -149,14 +164,30 @@ export class MemoryView extends ReactWidget {
         return <div id='t-mv-wrapper'>
             <div className='t-mv-group'>
                 <span className='t-mv-input-group'>
-                    <label className='t-mv-label'>Address</label>
+                    <label className='t-mv-label'>Location</label>
                     <input
-                        id='t-mv-search'
+                        id={MemoryView.LOCATION_FIELD_ID}
                         className='t-mv-input'
                         type='text'
                         size={15}
+                        title='Memory location to display, an address or expression evaluating to an address'
                         onKeyUp={this.doRefresh} />
                 </span>
+                <span className='t-mv-input-group'>
+                    <label className='t-mv-label'>Length</label>
+                    <input
+                        id={MemoryView.LENGTH_FIELD_ID}
+                        className='t-mv-input'
+                        type='text'
+                        size={6}
+                        title='Number of bytes to fetch, in decimal or hexadecimal'
+                        onKeyUp={this.doRefresh}
+                        defaultValue='256' />
+                </span>
+                <span className='t-mv-input-group'>
+                    <button onClick={this.doRefresh}>Go</button>
+                </span>
+                <span style={{ width: '30px' }}></span>
                 <span className='t-mv-input-group'>
                     <label className='t-mv-label'>Bytes Per Row</label>
                     <input
@@ -297,17 +328,33 @@ export class MemoryView extends ReactWidget {
         </React.Fragment>;
     }
 
-    protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key !== 'Enter') {
+    protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+        if ('key' in event && event.key !== 'Enter') {
             return;
         }
 
-        const field = this.findSearchField();
-        if (field === undefined) {
+        // Remove results from previous run.
+        this.memoryReadResult = undefined;
+
+        const locationField = this.findLocationField();
+        const lengthField = this.findLengthField();
+        if (locationField === undefined || lengthField === undefined) {
             return;
         }
 
-        this.memoryProvider.readMemory(field.value, 128)
+        if (locationField.value.length == 0) {
+            this.memoryReadError = 'Enter an address or expression in the Location field.';
+            this.update();
+            return
+        }
+
+        if (lengthField.value.length == 0) {
+            this.memoryReadError = 'Enter a length (decimal or hexadecimal number) in the Length field.';
+            this.update();
+            return
+        }
+
+        this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value))
             .then(result => {
                 this.memoryReadResult = result;
                 this.update();
