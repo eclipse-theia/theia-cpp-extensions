@@ -28,7 +28,7 @@ export interface MemoryProvider {
      * Read `number` bytes of memory at address `location`, which can be
      * any expression evaluating to an address.
      */
-    readMemory(location: string, length: number): Promise<MemoryReadResult>;
+    readMemory(location: string, length: number, offset?: number): Promise<MemoryReadResult>;
 }
 
 /**
@@ -52,10 +52,11 @@ function hex2bytes(hex: string): Uint8Array {
  */
 @injectable()
 export class MemoryProviderImpl implements MemoryProvider {
+
     @inject(DebugSessionManager)
     protected readonly debugSessionManager!: DebugSessionManager;
 
-    async readMemory(location: string, length: number): Promise<MemoryReadResult> {
+    async readMemory(location: string, length: number, offset: number = 0): Promise<MemoryReadResult> {
         const session = this.debugSessionManager.currentSession;
         if (session === undefined) {
             throw new Error('No active debug session.');
@@ -64,14 +65,12 @@ export class MemoryProviderImpl implements MemoryProvider {
         const result = await session.sendCustomRequest('cdt-gdb-adapter/Memory', {
             address: location,
             length: length,
+            offset,
         });
 
         const bytes = hex2bytes(result.body.data);
         const address = parseInt(result.body.address, 16);
 
-        return {
-            bytes: bytes,
-            address: address,
-        };
+        return { bytes, address };
     }
 }

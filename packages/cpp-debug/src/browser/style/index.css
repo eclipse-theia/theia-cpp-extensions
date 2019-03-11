@@ -15,10 +15,24 @@
  ********************************************************************************/
 
 .t-mv-container {
+    display: flex;
+    flex-direction: column;
     align-items: left;
     box-sizing: border-box;
     height: 100%;
     padding: 10px;
+}
+
+.t-mv-container button:focus {
+    border: none; /* Fixes a padding issue when clicking a button */
+}
+
+#t-mv-view-container {
+    flex: 1;
+    overflow: auto;
+}
+#t-mv-view-container:focus {
+    border: none; /* Fixes a padding issue when clicking inside the container */
 }
 
 #t-mv-input-container-seperator {
@@ -93,6 +107,10 @@ table#t-mv-view th {
     font-family: monospace;
     color: var(--theia-ui-font-color0);
     padding-right: 15px;
+}
+
+table#t-mv-view .t-mv-view-row.t-mv-view-row-highlight {
+    border-bottom: 1px var(--theia-border-color2) solid;
 }
 
 table#t-mv-view .t-mv-view-row:hover {

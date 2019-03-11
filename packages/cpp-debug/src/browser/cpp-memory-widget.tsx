@@ -18,6 +18,7 @@ import * as React from 'react';
 import { MemoryProvider, MemoryReadResult } from './memory-provider';
 import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
+import { debounce } from 'lodash';
 
 /**
  * Return true if `byte` represents a printable ASCII character.
@@ -37,52 +38,50 @@ function isValidEndianness(val: string): val is Endianness {
 /**
  * Iterators to be able to iterate forward and backwards on byte arrays.
  */
-class ForwardIterator implements Iterator<number> {
+class ForwardIterator<T = any> implements Iterator<T> {
     private nextItem: number = 0;
 
-    constructor(private array: Uint8Array) { }
+    constructor(private array: T[]) { }
 
-    next(): IteratorResult<number> {
+    next(): IteratorResult<T> {
         if (this.nextItem < this.array.length) {
             return {
                 value: this.array[this.nextItem++],
                 done: false,
-            }
+            };
         } else {
             return {
                 done: true,
-                value: 0,
+                value: undefined as any,
             };
         }
     }
 
-    [Symbol.iterator](): IterableIterator<number> {
+    [Symbol.iterator](): IterableIterator<T> {
         return this;
     }
 }
 
-class ReverseIterator implements Iterator<number> {
-    private nextItem: number;
+class ReverseIterator<T = any> implements Iterator<T> {
+    private nextItem = this.array.length - 1;
 
-    constructor(private array: Uint8Array) {
-        this.nextItem = this.array.length - 1;
-    }
+    constructor(private array: T[]) { }
 
-    next(): IteratorResult<number> {
+    next(): IteratorResult<T> {
         if (this.nextItem >= 0) {
             return {
                 value: this.array[this.nextItem--],
                 done: false,
-            }
+            };
         } else {
             return {
                 done: true,
-                value: 0,
+                value: undefined as any,
             };
         }
     }
 
-    [Symbol.iterator](): IterableIterator<number> {
+    [Symbol.iterator](): IterableIterator<T> {
         return this;
     }
 }
@@ -94,6 +93,7 @@ export class MemoryView extends ReactWidget {
     static readonly LABEL = 'Memory';
 
     static readonly LOCATION_FIELD_ID = 't-mv-location';
+    static readonly LOCATION_OFFSET_FIELD_ID = 't-mv-location-offset';
     static readonly LENGTH_FIELD_ID = 't-mv-length';
     static readonly BYTES_PER_ROW_FIELD_ID = 't-mv-bytesrow';
     static readonly BYTES_PER_GROUP_FIELD_ID = 't-mv-bytesgroup';
@@ -102,6 +102,7 @@ export class MemoryView extends ReactWidget {
     static readonly ENDIANNESS_BUTTONS_NAME = "t-mv-endianness";
 
     protected memoryReadResult: MemoryReadResult | undefined = undefined;
+    protected memoryReadResultOffset: number = 0;
     // If bytes is undefined, this string explains why.
     protected memoryReadError: string = 'No memory contents currently available.';
 
@@ -127,6 +128,25 @@ export class MemoryView extends ReactWidget {
         this.focusLocationField();
     }
 
+    protected get locationOffset(): number {
+        const locationOffssetField = this.findLocationOffsetField();
+        if (locationOffssetField) {
+            const locationOffset = parseInt(locationOffssetField.value);
+            if (isNaN(locationOffset)) {
+                return this.locationOffset = 0;
+            }
+            return locationOffset;
+        }
+        return 0;
+    }
+
+    protected set locationOffset(value: number) {
+        const locationOffsetField = this.findLocationOffsetField();
+        if (locationOffsetField) {
+            locationOffsetField.value = value.toString(10);
+        }
+    }
+
     protected findField(id: string): HTMLInputElement | undefined {
         const field = document.getElementById(id);
         if (field === null) {
@@ -138,6 +158,10 @@ export class MemoryView extends ReactWidget {
 
     protected findLocationField(): HTMLInputElement | undefined {
         return this.findField(MemoryView.LOCATION_FIELD_ID);
+    }
+
+    protected findLocationOffsetField(): HTMLInputElement | undefined {
+        return this.findField(MemoryView.LOCATION_OFFSET_FIELD_ID);
     }
 
     protected findLengthField(): HTMLInputElement | undefined {
@@ -171,6 +195,19 @@ export class MemoryView extends ReactWidget {
                         type='text'
                         size={15}
                         title='Memory location to display, an address or expression evaluating to an address'
+                        onChange={this.onLocationChange}
+                        onKeyUp={this.doRefresh} />
+                </span>
+                <span className='t-mv-input-group'>
+                    <label className='t-mv-label'>Offset</label>
+                    <input
+                        id={MemoryView.LOCATION_OFFSET_FIELD_ID}
+                        className='t-mv-input'
+                        type='text'
+                        size={15}
+                        title='Offset to be added to the current memory location, when navigating'
+                        defaultValue={this.locationOffset.toString()}
+                        onChange={this.onLocationOffsetChange}
                         onKeyUp={this.doRefresh} />
                 </span>
                 <span className='t-mv-input-group'>
@@ -251,7 +288,7 @@ export class MemoryView extends ReactWidget {
         }
 
         const rows = this.renderViewRows(this.memoryReadResult);
-        return <div id='t-mv-view-container'>
+        return <div id='t-mv-view-container' onWheel={this.onWheelMemoryView} onKeyDown={this.onKeyboardMemoryView} tabIndex={0}>
             <table id='t-mv-view'>
                 <thead>
                     <tr>
@@ -273,29 +310,57 @@ export class MemoryView extends ReactWidget {
         </div>
     }
 
+    protected *offsetedBytes(bytes: Uint8Array, offset: number): Iterable<number | undefined> {
+        for (let i = 0; i < bytes.length; i++) {
+            if (i < -offset || i > bytes.length + -offset) {
+                yield undefined;
+            } else {
+                yield bytes[i + offset];
+            }
+        }
+    }
+
     protected renderViewRows(result: MemoryReadResult): React.ReactNode {
-        const rows: string[][] = [];
+        const locationOffset = this.locationOffset;
+        const locationOffsetDelta = locationOffset - this.memoryReadResultOffset;
+        const address = result.address;
+        const rows: [number, ...string[]][] = [];
+
+        const iterator = this.offsetedBytes(result.bytes, locationOffsetDelta)[Symbol.iterator]();
 
         // For each row...
         for (let rowOffset = 0; rowOffset < result.bytes.length; rowOffset += this.bytesPerRow) {
             // Bytes shown in this row.
-            const rowBytes = result.bytes.subarray(rowOffset, rowOffset + this.bytesPerRow);
 
-            const addressStr = '0x' + (result.address + rowOffset).toString(16);
+            const rowBytes: Array<number | undefined> = [];
+            for (let i = 0; i < this.bytesPerRow; i++) {
+                rowBytes.push(iterator.next().value);
+            }
+
+            const rowAddr = address + rowOffset + locationOffsetDelta
+            const addressStr = '0x' + rowAddr.toString(16);
             let rowBytesStr = '';
             let asciiStr = '';
 
             // For each byte group in the row...
             for (let groupOffset = 0; groupOffset < rowBytes.length; groupOffset += this.bytesPerGroup) {
+
                 // Bytes shown in this group.
-                const groupBytes = rowBytes.subarray(groupOffset, groupOffset + this.bytesPerGroup);
+                const groupBytes = rowBytes.slice(groupOffset, groupOffset + this.bytesPerGroup);
 
                 let groupStr = '';
 
-                const iteratorType = this.endianness == 'be' ? ForwardIterator : ReverseIterator;
+                const iteratorType: { new(...args: any[]): Iterable<number | undefined> } =
+                    this.endianness == 'be' ? ForwardIterator : ReverseIterator;
 
                 // For each byte in the group
                 for (const byte of new iteratorType(groupBytes)) {
+
+                    if (typeof byte === 'undefined') {
+                        groupStr += 'xx';
+                        continue;
+                    }
+
                     const byteStr = byte.toString(16);
                     if (byteStr.length == 1) {
                         groupStr += '0';
@@ -308,37 +373,101 @@ export class MemoryView extends ReactWidget {
 
                 // The ASCII view is always in strictly increasing address order.
                 for (const byte of groupBytes) {
-                    asciiStr += isprint(byte) ? String.fromCharCode(byte) : '.';
+                    asciiStr += typeof byte === 'undefined' ?
+                        ' ' : isprint(byte) ? String.fromCharCode(byte) : '.' ;
                 }
             }
 
-            rows.push([addressStr, rowBytesStr, asciiStr])
+            rows.push([rowAddr, addressStr, rowBytesStr, asciiStr])
         }
 
-        return <React.Fragment>
-            {
-                rows.map((row, index) =>
-                    <tr className='t-mv-view-row' key={index}>
-                        <td className='t-mv-view-address'>{row[0]}</td>
-                        <td className='t-mv-view-data'>{row[1]}</td>
-                        <td className='t-mv-view-code'>{row[2]}</td>
-                    </tr>
-                )
+        return rows.map((row, index) =>
+            <tr className={ 't-mv-view-row' + (
+                // Add a marker to help visual navigation when scrolling
+                row[0] % (this.bytesPerRow * 8) < this.bytesPerRow ?
+                    ' t-mv-view-row-highlight' : '')
+            } key={index}>
+                <td className='t-mv-view-address'>{row[1]}</td>
+                <td className='t-mv-view-data'>{row[2]}</td>
+                <td className='t-mv-view-code'>{row[3]}</td>
+            </tr>);
+    }
+
+    protected onWheelMemoryView = (event: React.WheelEvent) => {
+        if (this.memoryReadResult) {
+            const { scrollTop } = event.currentTarget;
+            const containerHeight = event.currentTarget.getBoundingClientRect().height;
+            const contentHeight = event.currentTarget.firstElementChild!.getBoundingClientRect().height;
+            const scrollMax = Math.max(0, contentHeight - containerHeight);
+            const canScrollDown = scrollTop >= scrollMax;
+            const canScrollUp = scrollTop <= 0;
+
+            const { deltaY } = event;
+            const step = this.bytesPerRow * 2;
+
+            if (canScrollUp && deltaY < 0) { // wheel up: go up
+                this.locationOffset -= step;
+            } else if (canScrollDown && deltaY > 0) { // wheel down: go down
+                this.locationOffset += step;
+            } else {
+                return;
             }
-        </React.Fragment>;
+            this.update();
+            this.updateMemoryView();
+        }
+    };
+
+    protected onKeyboardMemoryView = (event: React.KeyboardEvent) => {
+        if (this.memoryReadResult) {
+            const { scrollTop } = event.currentTarget;
+            const containerHeight = event.currentTarget.getBoundingClientRect().height;
+            const contentHeight = event.currentTarget.firstElementChild!.getBoundingClientRect().height;
+            const scrollMax = Math.max(0, contentHeight - containerHeight);
+            const canScrollDown = scrollTop >= scrollMax;
+            const canScrollUp = scrollTop <= 0;
+
+            const step = this.bytesPerRow * 2; // skip a few lines at most
+            const bigStep = 256; // move past the whole result page
+
+            if (canScrollUp && event.key === 'ArrowUp') {
+                this.locationOffset -= step;
+            } else if (canScrollDown && event.key === 'ArrowDown') {
+                this.locationOffset += step;
+
+            } else if (canScrollUp && event.key === 'PageUp') {
+                this.locationOffset -= bigStep;
+            } else if (canScrollDown && event.key === 'PageDown') {
+                this.locationOffset += bigStep;
+
+            } else {
+                return;
+            }
+            this.update();
+            this.updateMemoryView();
+        }
     }
 
     protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
         if ('key' in event && event.key !== 'Enter') {
             return;
         }
+        this.updateMemoryView();
+    }
+
+    protected updateMemoryView = debounce(this.doUpdateMemoryView.bind(this), 200);
+    protected doUpdateMemoryView() {
 
         // Remove results from previous run.
         this.memoryReadResult = undefined;
 
         const locationField = this.findLocationField();
+        const locationOffsetField = this.findLocationOffsetField();
         const lengthField = this.findLengthField();
-        if (locationField === undefined || lengthField === undefined) {
+        if (
+            locationField === undefined ||
+            locationOffsetField === undefined ||
+            lengthField === undefined
+        ) {
             return;
         }
 
@@ -354,9 +483,11 @@ export class MemoryView extends ReactWidget {
             return
         }
 
-        this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value))
+        const locationOffset = this.locationOffset;
+        this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value), locationOffset)
             .then(result => {
                 this.memoryReadResult = result;
+                this.memoryReadResultOffset = locationOffset;
                 this.update();
             }).catch(err => {
                 console.error('Failed to read memory', err);
@@ -364,7 +495,24 @@ export class MemoryView extends ReactWidget {
                 this.memoryReadResult = undefined;
                 this.update();
             });
-    };
+    }
+
+    protected onLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const locationOffsetField = this.findLocationOffsetField();
+        if (locationOffsetField) {
+            locationOffsetField.value = '0';
+            this.locationOffset = 0;
+        }
+    }
+
+    protected onLocationOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        if (!/^\d*$/.test(value)) {
+            return;
+        }
+
+        this.locationOffset = value.length > 0 ? parseInt(value, 10) : 0;
+    }
 
     // Callbacks for when the various view parameters change.
     protected onBytesPerRowChange = (event: React.ChangeEvent<HTMLInputElement>) => {
