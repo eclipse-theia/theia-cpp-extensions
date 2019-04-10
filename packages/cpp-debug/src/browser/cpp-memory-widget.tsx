@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import * as Long from 'long';
 import * as React from 'react';
 import { MemoryProvider, MemoryReadResult } from './memory-provider';
 import { injectable, postConstruct, inject } from 'inversify';
@@ -324,7 +325,7 @@ export class MemoryView extends ReactWidget {
         const locationOffset = this.locationOffset;
         const locationOffsetDelta = locationOffset - this.memoryReadResultOffset;
         const address = result.address;
-        const rows: [number, ...string[]][] = [];
+        const rows: [Long, ...string[]][] = [];
 
         const iterator = this.offsetedBytes(result.bytes, locationOffsetDelta)[Symbol.iterator]();
 
@@ -337,7 +338,7 @@ export class MemoryView extends ReactWidget {
                 rowBytes.push(iterator.next().value);
             }
 
-            const rowAddr = address + rowOffset + locationOffsetDelta
+            const rowAddr = address.add(rowOffset).add(locationOffsetDelta)
             const addressStr = '0x' + rowAddr.toString(16);
             let rowBytesStr = '';
             let asciiStr = '';
@@ -384,7 +385,7 @@ export class MemoryView extends ReactWidget {
         return rows.map((row, index) =>
             <tr className={ 't-mv-view-row' + (
                 // Add a marker to help visual navigation when scrolling
-                row[0] % (this.bytesPerRow * 8) < this.bytesPerRow ?
+                row[0].modulo(this.bytesPerRow * 8).lessThan(this.bytesPerRow) ?
                     ' t-mv-view-row-highlight' : '')
             } key={index}>
                 <td className='t-mv-view-address'>{row[1]}</td>
