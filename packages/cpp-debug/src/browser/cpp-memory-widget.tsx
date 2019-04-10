@@ -16,15 +16,19 @@
 
 import * as Long from 'long';
 import * as React from 'react';
-import { MemoryProvider, MemoryReadResult } from './memory-provider';
+import { debounce } from 'lodash';
+import { MemoryProvider, VariableRange, MemoryReadResult } from './memory-provider';
 import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
-import { debounce } from 'lodash';
+import { DebugSession } from '@theia/debug/lib/browser/debug-session';
+import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
+import { DebugVariable } from '@theia/debug/lib/browser/console/debug-console-items';
+import { hexStrToUnsignedLong } from '../common/util';
 
 /**
  * Return true if `byte` represents a printable ASCII character.
  */
-function isPrintable(byte: number): boolean {
+function isBytePrintable(byte: number): boolean {
     return byte >= 32 && byte < 127;
 }
 
@@ -41,24 +45,78 @@ function isValidEndianness(val: string): val is Endianness {
 }
 
 /**
+ * Representation of an indexed item.
+ */
+interface IndexedItem<T> {
+    /**
+     * Index of the item in the item array.
+     */
+    index: number;
+    /**
+     * Value of the item.
+     */
+    item: T;
+}
+
+/**
  * Iterators to be able to iterate forward and backwards on byte arrays.
  */
-// tslint:disable-next-line:no-any
-class ForwardIterator<T = any> implements Iterator<T> {
-    /**
-     * The current next item index.
-     */
-    private nextItem: number = 0;
+class BigEndianByteIterator<T> implements Iterator<IndexedItem<T>> {
+
+    // The current next item index.
+    private nextIndex: number = 0;
 
     constructor(private array: T[]) { }
 
     /**
-     * Iterate over the next result.
+     * Iterate ove the next item result.
      */
-    next(): IteratorResult<T> {
-        if (this.nextItem < this.array.length) {
+    next(): IteratorResult<IndexedItem<T>> {
+        if (this.nextIndex < this.array.length) {
+            const thisIndex = this.nextIndex++;
             return {
-                value: this.array[this.nextItem++],
+                value: {
+                    index: thisIndex,
+                    item: this.array[thisIndex],
+                },
+                done: false,
+            };
+        } else {
+            return {
+                done: true,
+                // tslint:disable-next-line:no-any
+                value: undefined as any,
+            };
+        }
+    }
+    /**
+     * Returns instance of the iterator.
+     */
+    [Symbol.iterator](): IterableIterator<IndexedItem<T>> {
+        return this;
+    }
+}
+
+class LittleEndianByteIterator<T> implements Iterator<IndexedItem<T>> {
+
+    // The current next item index.
+    private nextIndex: number;
+
+    constructor(private array: T[]) {
+        this.nextIndex = this.array.length - 1;
+    }
+
+    /**
+     * Iterate over the next item.
+     */
+    next(): IteratorResult<IndexedItem<T>> {
+        if (this.nextIndex >= 0) {
+            const thisIndex = this.nextIndex--;
+            return {
+                value: {
+                    index: thisIndex,
+                    item: this.array[thisIndex],
+                },
                 done: false,
             };
         } else {
@@ -73,44 +131,25 @@ class ForwardIterator<T = any> implements Iterator<T> {
     /**
      * Returns instance of the iterator.
      */
-    [Symbol.iterator](): IterableIterator<T> {
+    [Symbol.iterator](): IterableIterator<IndexedItem<T>> {
         return this;
     }
 }
 
-// tslint:disable-next-line:no-any
-class ReverseIterator<T = any> implements Iterator<T> {
-    /**
-     * The current next item index.
-     */
-    private nextItem = this.array.length - 1;
-
-    constructor(private array: T[]) { }
-
-    /**
-     * Iterate over the next result.
-     */
-    next(): IteratorResult<T> {
-        if (this.nextItem >= 0) {
-            return {
-                value: this.array[this.nextItem--],
-                done: false,
-            };
-        } else {
-            return {
-                done: true,
-                // tslint:disable-next-line:no-any
-                value: undefined as any,
-            };
+/**
+ * Check if the address `byteAddress` is located within the range of one of
+ * the variables of `variables`.  Return the index of the variable which
+ * matches.
+ */
+function isInVariable(byteAddress: Long, variables: VariableRange[]): number {
+    for (let i = 0; i < variables.length; i++) {
+        const variable = variables[i];
+        if (byteAddress.ge(variable.address) && byteAddress.lt(variable.pastTheEndAddress)) {
+            return i;
         }
     }
 
-    /**
-     * Return an instance of the iterator.
-     */
-    [Symbol.iterator](): IterableIterator<T> {
-        return this;
-    }
+    return -1;
 }
 
 @injectable()
@@ -171,6 +210,9 @@ export class MemoryView extends ReactWidget {
      */
     protected memoryReadError: string = 'No memory contents currently available.';
 
+    // Details about the current local variables.
+    protected variables: VariableRange[] | undefined = undefined;
+
     // Parameters for the rendering of the memory contents.
     /**
      * The current bytes per row.
@@ -190,6 +232,12 @@ export class MemoryView extends ReactWidget {
      */
     @inject(MemoryProvider)
     protected readonly memoryProvider!: MemoryProvider;
+
+    /**
+     * Injected debug session manager.
+     */
+    @inject(DebugSessionManager)
+    protected readonly debugSessionManager!: DebugSessionManager;
 
     /**
      * Initialize the widget.
@@ -288,7 +336,7 @@ export class MemoryView extends ReactWidget {
     protected render(): React.ReactNode {
         return <div className='t-mv-container'>
             {this.renderInputContainer()}
-            <hr id='t-mv-input-container-seperator' />
+            <hr id='t-mv-input-container-separator' />
             {this.renderView()}
         </div>;
     }
@@ -303,6 +351,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-label'>Location</label>
                     <input
                         id={MemoryView.LOCATION_FIELD_ID}
+                        key={MemoryView.LOCATION_FIELD_ID}
                         className='t-mv-input'
                         type='text'
                         size={15}
@@ -314,6 +363,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-label'>Offset</label>
                     <input
                         id={MemoryView.LOCATION_OFFSET_FIELD_ID}
+                        key={MemoryView.LOCATION_OFFSET_FIELD_ID}
                         className='t-mv-input'
                         type='text'
                         size={15}
@@ -326,6 +376,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-label'>Length</label>
                     <input
                         id={MemoryView.LENGTH_FIELD_ID}
+                        key={MemoryView.LENGTH_FIELD_ID}
                         className='t-mv-input'
                         type='text'
                         size={6}
@@ -341,6 +392,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-label'>Bytes Per Row</label>
                     <input
                         id={MemoryView.BYTES_PER_ROW_FIELD_ID}
+                        key={MemoryView.BYTES_PER_ROW_FIELD_ID}
                         className='t-mv-input'
                         type='text'
                         size={5}
@@ -351,6 +403,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-label'>Bytes Per Group</label>
                     <select
                         id={MemoryView.BYTES_PER_GROUP_FIELD_ID}
+                        key={MemoryView.BYTES_PER_GROUP_FIELD_ID}
                         className='t-mv-input'
                         defaultValue={this.bytesPerGroup.toString()}
                         onChange={this.onBytesPerGroupChange}>
@@ -365,6 +418,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-radio-label'>
                         <input
                             id={MemoryView.LITTLE_ENDIAN_BUTTON_ID}
+                            key={MemoryView.LITTLE_ENDIAN_BUTTON_ID}
                             type='radio'
                             value='le'
                             name={MemoryView.ENDIANNESS_BUTTONS_NAME}
@@ -375,6 +429,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-radio-label'>
                         <input
                             id={MemoryView.BIG_ENDIAN_BUTTON_ID}
+                            key={MemoryView.BIG_ENDIAN_BUTTON_ID}
                             type='radio'
                             value='be'
                             name={MemoryView.ENDIANNESS_BUTTONS_NAME}
@@ -406,7 +461,7 @@ export class MemoryView extends ReactWidget {
             return this.renderErrorMessage(this.memoryReadError);
         }
 
-        const rows = this.renderViewRows(this.memoryReadResult);
+        const rows = this.renderViewRows(this.memoryReadResult, this.variables || []);
         return <div id='t-mv-view-container' onWheel={this.onWheelMemoryView} onKeyDown={this.onKeyboardMemoryView} tabIndex={0}>
             <table id='t-mv-view'>
                 <thead>
@@ -430,11 +485,9 @@ export class MemoryView extends ReactWidget {
     }
 
     /**
-     * Get the offseted bytes.
-     * @param bytes the bytes.
-     * @param offset the offset.
+     * Yields offsetted bytes from the given array `bytes`.
      */
-    protected *offsetedBytes(bytes: Uint8Array, offset: number): Iterable<number | undefined> {
+    protected *offsettedBytes(bytes: Uint8Array, offset: number): Iterable<number | undefined> {
         for (let i = 0; i < bytes.length; i++) {
             if (i < -offset || i > bytes.length + -offset) {
                 yield undefined;
@@ -447,14 +500,33 @@ export class MemoryView extends ReactWidget {
     /**
      * Render the table rows.
      * @param result the memory read result.
+     * @param variables the list of variable ranges.
      */
-    protected renderViewRows(result: MemoryReadResult): React.ReactNode {
+    protected renderViewRows(result: MemoryReadResult, variables: VariableRange[]): React.ReactNode {
         const locationOffset = this.locationOffset;
         const locationOffsetDelta = locationOffset - this.memoryReadResultOffset;
-        const address = result.address;
-        const rows: [Long, ...string[]][] = [];
 
-        const iterator = this.offsetedBytes(result.bytes, locationOffsetDelta)[Symbol.iterator]();
+        const iterator = this.offsettedBytes(result.bytes, locationOffsetDelta)[Symbol.iterator]();
+
+        /**
+         * Representation of a render row.
+         */
+        interface RenderRow {
+            location: Long
+            address: string;
+            nodes: React.ReactNode;
+            ascii: string;
+        }
+        const rows: RenderRow[] = [];
+        const pastTheEndAddress = result.address.add(result.bytes.length);
+
+        // Filter down to variables that are in the scope of what we're showing in the
+        // memory view.
+        const variablesInRange = variables.filter(variable => {
+            const isBefore = variable.pastTheEndAddress.le(result.address);
+            const isAfter = variable.address.ge(pastTheEndAddress);
+            return !(isBefore || isAfter);
+        }).sort((first, second) => first.address.compare(second.address));
 
         // For each row...
         for (let rowOffset = 0; rowOffset < result.bytes.length; rowOffset += this.bytesPerRow) {
@@ -465,60 +537,77 @@ export class MemoryView extends ReactWidget {
                 rowBytes.push(iterator.next().value);
             }
 
-            const rowAddr = address.add(rowOffset).add(locationOffsetDelta);
-            const addressStr = '0x' + rowAddr.toString(16);
-            let rowBytesStr = '';
+            const rowAddress: Long = result.address.add(rowOffset).add(locationOffsetDelta);
+            const addressStr: string = '0x' + rowAddress.toString(16);
+            const rowNodes: React.ReactNode[] = [];
             let asciiStr = '';
 
             // For each byte group in the row...
             for (let groupOffset = 0; groupOffset < rowBytes.length; groupOffset += this.bytesPerGroup) {
 
                 // Bytes shown in this group.
+                const groupAddress = rowAddress.add(groupOffset);
                 const groupBytes = rowBytes.slice(groupOffset, groupOffset + this.bytesPerGroup);
 
-                let groupStr = '';
-
-                // tslint:disable-next-line:no-any
-                const iteratorType: { new(...args: any[]): Iterable<number | undefined> } =
-                    this.endianness === 'be' ? ForwardIterator : ReverseIterator;
+                // tslint:disable-next-line: no-any
+                const iteratorType: { new(...args: any[]): Iterable<IndexedItem<number | undefined>> } =
+                    this.endianness === 'be' ? BigEndianByteIterator : LittleEndianByteIterator;
 
                 // For each byte in the group
-                for (const byte of new iteratorType(groupBytes)) {
+                for (const indexedByte of new iteratorType(groupBytes)) {
 
-                    if (typeof byte === 'undefined') {
-                        groupStr += 'xx';
+                    if (!indexedByte || !indexedByte.item) {
+                        rowNodes.push(<span>xx</span>);
                         continue;
                     }
-
-                    const byteStr = byte.toString(16);
-                    if (byteStr.length === 1) {
-                        groupStr += '0';
+                    let byteStr: string = indexedByte.item!.toString(16);
+                    if (byteStr.length === 0) {
+                        byteStr = 'xx';
+                    } else if (byteStr.length === 1) {
+                        byteStr = '0' + byteStr;
                     }
 
-                    groupStr += byteStr;
+                    const byteAddress = groupAddress.add(indexedByte.index);
+                    const inVariableIdx = isInVariable(byteAddress, variablesInRange);
+
+                    // If this byte is part of a local variable, highlight it.
+                    if (inVariableIdx >= 0) {
+                        const hue = 360 * (inVariableIdx / variablesInRange.length);
+                        const props: React.CSSProperties = {
+                            color: `hsl(${hue}, 60%, 60%)`,
+                        };
+                        rowNodes.push(<span style={props} title={variablesInRange[inVariableIdx].name}>{byteStr}</span>);
+                    } else {
+                        rowNodes.push(<span>{byteStr}</span>);
+                    }
                 }
 
-                rowBytesStr += groupStr + ' ';
+                rowNodes.push(<span>&nbsp;</span>);
 
                 // The ASCII view is always in strictly increasing address order.
                 for (const byte of groupBytes) {
                     asciiStr += typeof byte === 'undefined' ?
-                        ' ' : isPrintable(byte) ? String.fromCharCode(byte) : '.';
+                        ' ' : isBytePrintable(byte) ? String.fromCharCode(byte) : '.';
                 }
             }
 
-            rows.push([rowAddr, addressStr, rowBytesStr, asciiStr]);
+            rows.push({
+                location: rowAddress,
+                address: addressStr,
+                nodes: rowNodes,
+                ascii: asciiStr,
+            });
         }
 
         return rows.map((row, index) =>
             <tr className={'t-mv-view-row' + (
                 // Add a marker to help visual navigation when scrolling
-                row[0].modulo(this.bytesPerRow * 8).lessThan(this.bytesPerRow) ?
+                row.location.modulo(this.bytesPerRow * 8).lessThan(this.bytesPerRow) ?
                     ' t-mv-view-row-highlight' : '')
             } key={index}>
-                <td className='t-mv-view-address'>{row[1]}</td>
-                <td className='t-mv-view-data'>{row[2]}</td>
-                <td className='t-mv-view-code'>{row[3]}</td>
+                <td className='t-mv-view-address'>{row.address}</td>
+                <td className='t-mv-view-data'>{row.nodes}</td>
+                <td className='t-mv-view-code'>{row.ascii}</td>
             </tr>);
     }
 
@@ -599,46 +688,44 @@ export class MemoryView extends ReactWidget {
     /**
      * Actually update the memory view.
      */
-    protected doUpdateMemoryView(): void {
+    protected async doUpdateMemoryView(): Promise<void> {
+        try {
+            // Remove results from previous run.
+            this.memoryReadResult = undefined;
 
-        // Remove results from previous run.
-        this.memoryReadResult = undefined;
+            const locationField = this.findLocationField();
+            const locationOffsetField = this.findLocationOffsetField();
+            const lengthField = this.findLengthField();
+            if (
+                locationField === undefined ||
+                locationOffsetField === undefined ||
+                lengthField === undefined
+            ) {
+                return;
+            }
 
-        const locationField = this.findLocationField();
-        const locationOffsetField = this.findLocationOffsetField();
-        const lengthField = this.findLengthField();
-        if (
-            locationField === undefined ||
-            locationOffsetField === undefined ||
-            lengthField === undefined
-        ) {
-            return;
+            if (locationField.value.length === 0) {
+                throw new Error('Enter an address or expression in the Location field.');
+            }
+
+            if (lengthField.value.length === 0) {
+                throw new Error('Enter a length (decimal or hexadecimal number) in the Length field.');
+            }
+
+            const locationOffset = this.locationOffset;
+            this.memoryReadResult = await this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value), locationOffset);
+            this.memoryReadResultOffset = locationOffset;
+            this.variables = await getLocals(this.debugSessionManager.currentSession);
+
+        } catch (err) {
+            console.error('Failed to read memory', err);
+            this.memoryReadError = err.message;
+
+            this.memoryReadResult = undefined;
+            this.variables = undefined;
         }
 
-        if (locationField.value.length === 0) {
-            this.memoryReadError = 'Enter an address or expression in the Location field.';
-            this.update();
-            return;
-        }
-
-        if (lengthField.value.length === 0) {
-            this.memoryReadError = 'Enter a length (decimal or hexadecimal number) in the Length field.';
-            this.update();
-            return;
-        }
-
-        const locationOffset = this.locationOffset;
-        this.memoryProvider.readMemory(locationField.value, parseInt(lengthField.value), locationOffset)
-            .then(result => {
-                this.memoryReadResult = result;
-                this.memoryReadResultOffset = locationOffset;
-                this.update();
-            }).catch(err => {
-                console.error('Failed to read memory', err);
-                this.memoryReadError = err.message;
-                this.memoryReadResult = undefined;
-                this.update();
-            });
+        this.update();
     }
 
     /**
@@ -696,4 +783,63 @@ export class MemoryView extends ReactWidget {
         }
         this.update();
     }
+}
+
+/**
+ * Get the local variables of the currently selected frame.
+ */
+async function getLocals(session: DebugSession | undefined): Promise<VariableRange[]> {
+    if (session === undefined) {
+        console.warn('No active debug session.');
+        return [];
+    }
+
+    const frame = session.currentFrame;
+    if (frame === undefined) {
+        throw new Error('No active stack frame.');
+    }
+
+    const ranges: VariableRange[] = [];
+
+    const scopes = await frame.getScopes();
+    for (const scope of scopes) {
+        const variables = await scope.getElements();
+        for (const v of variables) {
+            if (v instanceof DebugVariable) {
+                const addrExp = `&${v.name}`;
+                const sizeExp = `sizeof(${v.name})`;
+                const addrResp = await session.sendRequest('evaluate', {
+                    expression: addrExp,
+                    context: 'watch',
+                    frameId: frame.raw.id,
+                });
+                const sizeResp = await session.sendRequest('evaluate', {
+                    expression: sizeExp,
+                    context: 'watch',
+                    frameId: frame.raw.id,
+                });
+
+                // Make sure the address is in the format we expect.
+                if (!/^0x[0-9a-fA-F]+$/.test(addrResp.body.result)) {
+                    continue;
+                }
+
+                if (!/^[0-9]+$/.test(sizeResp.body.result)) {
+                    continue;
+                }
+
+                const size = parseInt(sizeResp.body.result);
+                const address = hexStrToUnsignedLong(addrResp.body.result);
+                const pastTheEndAddress = address.add(size);
+
+                ranges.push({
+                    name: v.name,
+                    address: address,
+                    pastTheEndAddress: pastTheEndAddress,
+                });
+            }
+        }
+    }
+
+    return ranges;
 }

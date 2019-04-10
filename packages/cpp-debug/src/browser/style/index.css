@@ -35,7 +35,7 @@
     border: none; /* Fixes a padding issue when clicking inside the container */
 }
 
-#t-mv-input-container-seperator {
+#t-mv-input-container-separator {
     border: 1px solid var(--theia-layout-color2);
     margin-top: 10px;
 }
