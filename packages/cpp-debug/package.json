@@ -1,36 +1,39 @@
 {
   "name": "@theia/cpp-debug",
+  "version": "0.7.0",
   "description": "Theia - C/C++ Debug Extension",
+  "dependencies": {
+    "@theia/core": "next",
+    "@theia/debug": "next"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/cpp-debug-frontend-module",
+      "backend": "lib/node/cpp-debug-backend-module"
+    }
+  ],
+  "keywords": [
+    "theia-extension",
+    "cpp",
+    "debug"
+  ],
   "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/theia-ide/theia.git"
+    "url": "https://github.com/eclipse/theia-cpp-extension.git"
   },
-
   "bugs": {
-    "url": "https://github.com/theia-ide/theia/issues"
+    "url": "https://github.com/eclipse/theia-cpp-extension/issues"
   },
-  "homepage": "https://github.com/theia-ide/theia",
-  "keywords": [
-    "theia-extension", "cpp", "debug"
-  ],
-  "version": "0.3.19",
+  "homepage": "https://github.com/eclipse/theia-cpp-extension",
   "files": [
     "data",
     "lib",
     "src"
   ],
-  "dependencies": {
-    "@theia/core": "next",
-    "@theia/debug": "next"
-  },
-  "devDependencies": {
-    "rimraf": "^2.6.2",
-    "tar": "^4.0.0",
-    "typescript": "^3",
-    "unzip-stream": "^0.3.0",
-    "zlib": "^1.0.5"
-  },
   "scripts": {
     "postinstall": "yarn run download",
     "prepare": "yarn run clean && yarn run build",
@@ -39,10 +42,13 @@
     "build": "tsc",
     "watch": "tsc -w"
   },
-  "theiaExtensions": [{
-      "frontend": "lib/browser/cpp-debug-frontend-module",
-      "backend": "lib/node/cpp-debug-backend-module"
-  }],
+  "devDependencies": {
+    "rimraf": "^2.6.2",
+    "tar": "^4.0.0",
+    "typescript": "^3",
+    "unzip-stream": "^0.3.0",
+    "zlib": "^1.0.5"
+  },
   "adapters": {
     "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.89/cdt-gdb-vscode-0.0.89.tgz"
   }
