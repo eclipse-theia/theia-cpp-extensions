@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@theia/core": "next",
+    "@theia/electron": "next",
     "@theia/filesystem": "next",
     "@theia/workspace": "next",
     "@theia/preferences": "next",
@@ -25,7 +26,7 @@
     "@theia/cli": "next"
   },
   "scripts": {
-    "prepare": "theia build --mode development",    
+    "prepare": "theia build --mode development",
     "start": "theia start",
     "watch": "theia build --watch --mode development"
   },
