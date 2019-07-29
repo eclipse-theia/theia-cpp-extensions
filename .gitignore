@@ -4,3 +4,4 @@ lib
 *.log
 *-app/*
 !*-app/package.json
+examples/cpp-debug-workspace/build/

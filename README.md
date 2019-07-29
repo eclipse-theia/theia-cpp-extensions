@@ -34,6 +34,10 @@ provided by the repository.
    $ cd electron-app && yarn start
    ```
 
+## Example Workspaces
+- [`cpp-debug-workspace`](./examples/cpp-debug-workspace/README.md)
+    - provides an easy and reproducible way to test the functionality present in the `@theia/cpp-debug` extension. Includes a simple C/C++ program, debug launch configuration file (`launch.json`), and a task in order to compile the program (`tasks.json`).
+
 ## License
 
 - [Eclipse Public License 2.0](http://www.eclipse.org/legal/epl-2.0/)
