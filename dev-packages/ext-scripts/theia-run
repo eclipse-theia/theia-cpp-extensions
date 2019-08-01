@@ -1,5 +1,6 @@
+#!/usr/bin/env node
 /********************************************************************************
- * Copyright (C) 2019 Ericsson and others.
+ * Copyright (C) 2017 TypeFox and others.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,21 +14,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
+// @ts-check
+const path = require('path');
 
-import { ContainerModule } from 'inversify';
-import { MemoryView } from './cpp-memory-widget';
-import { CppContribution } from './cpp-debug-frontend-contribution';
-import { bindViewContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { MemoryProvider, MemoryProviderImpl } from './memory-provider';
+const index = process.argv.findIndex(arg => arg.indexOf('run') !== -1);
+const args = process.argv.slice(index + 1);
+const scopedArgs = args.length > 1 ? [args[0], '--scope', ...args.slice(1)] : args;
+process.argv = [...process.argv.slice(0, index + 1), 'run', ...scopedArgs];
 
-import '../../src/browser/style/index.css';
-
-export default new ContainerModule(bind => {
-    bindViewContribution(bind, CppContribution);
-    bind(MemoryProvider).to(MemoryProviderImpl).inSingletonScope();
-    bind(MemoryView).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: MemoryView.ID,
-        createWidget: () => ctx.container.get<MemoryView>(MemoryView)
-    })).inSingletonScope();
-});
+require(path.resolve(__dirname, '..', '..', 'scripts', 'lerna'));

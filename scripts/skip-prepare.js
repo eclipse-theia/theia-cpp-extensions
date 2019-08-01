@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+// @ts-check
 /********************************************************************************
  * Copyright (C) 2019 Ericsson and others.
  *
@@ -14,20 +16,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ContainerModule } from 'inversify';
-import { MemoryView } from './cpp-memory-widget';
-import { CppContribution } from './cpp-debug-frontend-contribution';
-import { bindViewContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { MemoryProvider, MemoryProviderImpl } from './memory-provider';
+/**
+ * Theia's `package.json` contains a `prepare` script which is triggered after each install.
+ * But we don't always want to build the whole project after installing dependencies.
+ * This script looks for an environment variable to skip the prepare step.
+ *
+ * Example (Unix): `THEIA_SKIP_NPM_PREPARE=1 yarn`
+ *
+ * Script returns successfully (code=0) when the variable is set, and fails (code>0)
+ * when variable is not set. This allows `script || a && b && ...` which will skip
+ * the following commands if `script` returns 0, but will keep going otherwise.
+ */
 
-import '../../src/browser/style/index.css';
-
-export default new ContainerModule(bind => {
-    bindViewContribution(bind, CppContribution);
-    bind(MemoryProvider).to(MemoryProviderImpl).inSingletonScope();
-    bind(MemoryView).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: MemoryView.ID,
-        createWidget: () => ctx.container.get<MemoryView>(MemoryView)
-    })).inSingletonScope();
-});
+if (process.env.THEIA_SKIP_NPM_PREPARE) {
+    console.error('skipping `npm prepare`')
+    process.exit(0) // stop
+} else {
+    process.exit(1) // ok
+}

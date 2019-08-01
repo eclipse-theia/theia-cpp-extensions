@@ -6,7 +6,9 @@
     "**/@types/node": "~10.3.6"
   },
   "devDependencies": {
-    "lerna": "^2.2.0"
+    "lerna": "^2.2.0",
+    "concurrently": "^3.5.0",
+    "tslint": "^5.12.0"
   },
   "scripts": {
     "prepare": "lerna run prepare",
@@ -22,11 +24,11 @@
     "test:theia": "true",
     "test:electron": "/bin/true",
     "test:browser": "/bin/true"
-
   },
   "workspaces": [
     "packages/*",
     "browser-app",
-    "electron-app"
+    "electron-app",
+    "dev-packages/*"
   ]
 }

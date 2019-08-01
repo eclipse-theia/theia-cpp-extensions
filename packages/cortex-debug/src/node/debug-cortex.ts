@@ -19,11 +19,15 @@
 /*
 Copyright 2017-2018 Marcel Ball
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the
+Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import { injectable } from 'inversify';
@@ -77,6 +81,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
             }
             if (!config.swoConfig.source) { config.swoConfig.source = 'probe'; }
             if (!config.swoConfig.decoders) { config.swoConfig.decoders = []; }
+            // tslint:disable-next-line:no-any
             config.swoConfig.decoders.forEach((d: any) => {
                 if (d.type === 'advanced') {
                     if (d.ports === undefined && d.number !== undefined) {
@@ -130,7 +135,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         return config;
     }
 
-    private verifyJLinkConfiguration(config: DebugConfiguration) {
+    private verifyJLinkConfiguration(config: DebugConfiguration): void {
         if (!config.device) {
             // tslint:disable-next-line:max-line-length
             throw new Error('Device Identifier is required for J-Link configurations. Please see https://www.segger.com/downloads/supported-devices.php for supported devices');
@@ -156,7 +161,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         if (config.jlinkpath && !config.serverpath) { config.serverpath = config.jlinkpath; }
     }
 
-    private verifyOpenOCDConfiguration(config: DebugConfiguration) {
+    private verifyOpenOCDConfiguration(config: DebugConfiguration): void {
         if (!config.configFiles || config.configFiles.length === 0) {
             throw new Error('At least one OpenOCD Configuration File must be specified.');
         }
@@ -169,7 +174,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         if (!config.searchDir || config.searchDir.length === 0) { config.searchDir = []; }
     }
 
-    private verifySTUtilConfiguration(config: DebugConfiguration) {
+    private verifySTUtilConfiguration(config: DebugConfiguration): void {
         if (config.rtos) {
             throw new Error('The st-util GDB Server does not have support for the rtos option.');
         }
@@ -182,7 +187,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         }
     }
 
-    private verifyPyOCDConfiguration(config: DebugConfiguration) {
+    private verifyPyOCDConfiguration(config: DebugConfiguration): void {
         if (config.rtos) {
             throw new Error('The PyOCD GDB Server does not have support for the rtos option.');
         }
@@ -197,7 +202,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         }
     }
 
-    private verifyBMPConfiguration(config: DebugConfiguration) {
+    private verifyBMPConfiguration(config: DebugConfiguration): void {
         if (!config.BMPGDBSerialPort) {
             throw new Error('A Serial Port for the Black Magic Probe GDB server is required.');
         }
@@ -215,7 +220,7 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         }
     }
 
-    private verifyExternalConfiguration(config: DebugConfiguration) {
+    private verifyExternalConfiguration(config: DebugConfiguration): void {
         if (config.swoConfig.enabled) {
             config.swoConfig = { enabled: false, ports: [], cpuFrequency: 0, swoFrequency: 0 };
             config.graphConfig = [];

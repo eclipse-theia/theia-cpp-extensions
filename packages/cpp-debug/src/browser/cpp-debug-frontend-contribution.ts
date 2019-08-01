@@ -14,12 +14,12 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { injectable } from "inversify";
-import { AbstractViewContribution, OpenViewArguments } from "@theia/core/lib/browser";
-import { Command, CommandRegistry, MenuModelRegistry } from "@theia/core/lib/common";
-import { MemoryView } from "./cpp-memory-widget";
+import { injectable } from 'inversify';
+import { AbstractViewContribution, OpenViewArguments } from '@theia/core/lib/browser';
+import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core/lib/common';
+import { MemoryView } from './cpp-memory-widget';
 
-export const MemoryCommand: Command = { id: 'cpp.command' }
+export const MemoryCommand: Command = { id: 'cpp.command' };
 
 @injectable()
 export class CppContribution extends AbstractViewContribution<MemoryView> {
