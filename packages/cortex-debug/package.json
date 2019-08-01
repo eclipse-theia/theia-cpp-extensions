@@ -34,16 +34,19 @@
     "postinstall": "yarn run download",
     "prepare": "yarn run clean && yarn run build",
     "download": "download-debug-adapters",
-    "clean": "rimraf lib",
-    "build": "tsc",
-    "watch": "tsc -w"
+    "clean": "theiaext clean",
+    "build": "theiaext build",
+    "watch": "theiaext watch",
+    "test": "theiaext test",
+    "test:watch": "theiaext test:watch"
   },
   "devDependencies": {
     "rimraf": "^2.6.2",
     "tar": "^4.0.0",
     "typescript": "^3",
     "unzip-stream": "^0.3.0",
-    "zlib": "^1.0.5"
+    "zlib": "^1.0.5",
+    "@theia/ext-scripts": "0.9.0"
   },
   "adapters": {
     "cortex-debug": "https://github.com/Marus/cortex-debug/releases/download/v0.1.21-test2/cortex-debug-0.1.21-test2.vsix"

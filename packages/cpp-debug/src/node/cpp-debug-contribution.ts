@@ -25,6 +25,7 @@ const adapterPath = join(__dirname, '../../download/cdt-gdb-vscode/package');
 
 // Load schema from package.json
 const packageJson = require(join(adapterPath, 'package.json'));
+// tslint:disable-next-line:no-any
 const CppDebugConfigurationSchema = packageJson.contributes.debuggers.filter((e: any) => e.type === adapterName)[0].configurationAttributes;
 
 export namespace cppDebugConfigurationValidators {

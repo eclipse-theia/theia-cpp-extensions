@@ -23,7 +23,7 @@ import { debounce } from 'lodash';
 /**
  * Return true if `byte` represents a printable ASCII character.
  */
-function isprint(byte: number) {
+function isPrintable(byte: number): boolean {
     return byte >= 32 && byte < 127;
 }
 
@@ -32,12 +32,13 @@ function isprint(byte: number) {
  */
 type Endianness = 'le' | 'be';
 function isValidEndianness(val: string): val is Endianness {
-    return val == 'le' || val == 'be';
+    return val === 'le' || val === 'be';
 }
 
 /**
  * Iterators to be able to iterate forward and backwards on byte arrays.
  */
+// tslint:disable-next-line:no-any
 class ForwardIterator<T = any> implements Iterator<T> {
     private nextItem: number = 0;
 
@@ -52,6 +53,7 @@ class ForwardIterator<T = any> implements Iterator<T> {
         } else {
             return {
                 done: true,
+                // tslint:disable-next-line:no-any
                 value: undefined as any,
             };
         }
@@ -62,6 +64,7 @@ class ForwardIterator<T = any> implements Iterator<T> {
     }
 }
 
+// tslint:disable-next-line:no-any
 class ReverseIterator<T = any> implements Iterator<T> {
     private nextItem = this.array.length - 1;
 
@@ -76,6 +79,7 @@ class ReverseIterator<T = any> implements Iterator<T> {
         } else {
             return {
                 done: true,
+                // tslint:disable-next-line:no-any
                 value: undefined as any,
             };
         }
@@ -97,9 +101,9 @@ export class MemoryView extends ReactWidget {
     static readonly LENGTH_FIELD_ID = 't-mv-length';
     static readonly BYTES_PER_ROW_FIELD_ID = 't-mv-bytesrow';
     static readonly BYTES_PER_GROUP_FIELD_ID = 't-mv-bytesgroup';
-    static readonly LITTLE_ENDIAN_BUTTON_ID = "t-mv-little-endian";
-    static readonly BIG_ENDIAN_BUTTON_ID = "t-mv-big-endian";
-    static readonly ENDIANNESS_BUTTONS_NAME = "t-mv-endianness";
+    static readonly LITTLE_ENDIAN_BUTTON_ID = 't-mv-little-endian';
+    static readonly BIG_ENDIAN_BUTTON_ID = 't-mv-big-endian';
+    static readonly ENDIANNESS_BUTTONS_NAME = 't-mv-endianness';
 
     protected memoryReadResult: MemoryReadResult | undefined = undefined;
     protected memoryReadResultOffset: number = 0;
@@ -253,8 +257,8 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-radio-label'>
                         <input
                             id={MemoryView.LITTLE_ENDIAN_BUTTON_ID}
-                            type="radio"
-                            value="le"
+                            type='radio'
+                            value='le'
                             name={MemoryView.ENDIANNESS_BUTTONS_NAME}
                             defaultChecked={this.endianness === 'le'}
                             onChange={this.onEndiannessChange} />
@@ -263,7 +267,7 @@ export class MemoryView extends ReactWidget {
                     <label className='t-mv-radio-label'>
                         <input
                             id={MemoryView.BIG_ENDIAN_BUTTON_ID}
-                            type="radio"
+                            type='radio'
                             value='be'
                             name={MemoryView.ENDIANNESS_BUTTONS_NAME}
                             onChange={this.onEndiannessChange}
@@ -272,14 +276,14 @@ export class MemoryView extends ReactWidget {
                     </label>
                 </span>
             </div>
-        </div>
+        </div>;
     }
 
     protected renderErrorMessage(msg: string): React.ReactNode {
         return <div className='t-mv-error'>
             <i className='fa fa-warning t-mv-error-icon'></i>
             {msg}
-        </div>
+        </div>;
     }
 
     protected renderView(): React.ReactNode {
@@ -307,7 +311,7 @@ export class MemoryView extends ReactWidget {
                     {rows}
                 </tbody>
             </table>
-        </div>
+        </div>;
     }
 
     protected *offsetedBytes(bytes: Uint8Array, offset: number): Iterable<number | undefined> {
@@ -337,7 +341,7 @@ export class MemoryView extends ReactWidget {
                 rowBytes.push(iterator.next().value);
             }
 
-            const rowAddr = address + rowOffset + locationOffsetDelta
+            const rowAddr = address + rowOffset + locationOffsetDelta;
             const addressStr = '0x' + rowAddr.toString(16);
             let rowBytesStr = '';
             let asciiStr = '';
@@ -350,8 +354,9 @@ export class MemoryView extends ReactWidget {
 
                 let groupStr = '';
 
+                // tslint:disable-next-line:no-any
                 const iteratorType: { new(...args: any[]): Iterable<number | undefined> } =
-                    this.endianness == 'be' ? ForwardIterator : ReverseIterator;
+                    this.endianness === 'be' ? ForwardIterator : ReverseIterator;
 
                 // For each byte in the group
                 for (const byte of new iteratorType(groupBytes)) {
@@ -362,7 +367,7 @@ export class MemoryView extends ReactWidget {
                     }
 
                     const byteStr = byte.toString(16);
-                    if (byteStr.length == 1) {
+                    if (byteStr.length === 1) {
                         groupStr += '0';
                     }
 
@@ -374,15 +379,15 @@ export class MemoryView extends ReactWidget {
                 // The ASCII view is always in strictly increasing address order.
                 for (const byte of groupBytes) {
                     asciiStr += typeof byte === 'undefined' ?
-                        ' ' : isprint(byte) ? String.fromCharCode(byte) : '.' ;
+                        ' ' : isPrintable(byte) ? String.fromCharCode(byte) : '.';
                 }
             }
 
-            rows.push([rowAddr, addressStr, rowBytesStr, asciiStr])
+            rows.push([rowAddr, addressStr, rowBytesStr, asciiStr]);
         }
 
         return rows.map((row, index) =>
-            <tr className={ 't-mv-view-row' + (
+            <tr className={'t-mv-view-row' + (
                 // Add a marker to help visual navigation when scrolling
                 row[0] % (this.bytesPerRow * 8) < this.bytesPerRow ?
                     ' t-mv-view-row-highlight' : '')
@@ -415,7 +420,7 @@ export class MemoryView extends ReactWidget {
             this.update();
             this.updateMemoryView();
         }
-    };
+    }
 
     protected onKeyboardMemoryView = (event: React.KeyboardEvent) => {
         if (this.memoryReadResult) {
@@ -455,7 +460,7 @@ export class MemoryView extends ReactWidget {
     }
 
     protected updateMemoryView = debounce(this.doUpdateMemoryView.bind(this), 200);
-    protected doUpdateMemoryView() {
+    protected doUpdateMemoryView(): void {
 
         // Remove results from previous run.
         this.memoryReadResult = undefined;
@@ -471,16 +476,16 @@ export class MemoryView extends ReactWidget {
             return;
         }
 
-        if (locationField.value.length == 0) {
+        if (locationField.value.length === 0) {
             this.memoryReadError = 'Enter an address or expression in the Location field.';
             this.update();
-            return
+            return;
         }
 
-        if (lengthField.value.length == 0) {
+        if (lengthField.value.length === 0) {
             this.memoryReadError = 'Enter a length (decimal or hexadecimal number) in the Length field.';
             this.update();
-            return
+            return;
         }
 
         const locationOffset = this.locationOffset;

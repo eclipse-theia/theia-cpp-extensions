@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "deprecation": true,
+    "await-promise": {
+      "severity": "warning",
+      "options": [
+        "Thenable",
+        "PromiseLike"
+      ]
+    },
+    "no-return-await": {
+      "severity": "warning"
+    }
+  }
+}
