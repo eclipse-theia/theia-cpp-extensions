@@ -55,6 +55,6 @@
     "@theia/ext-scripts": "0.9.0"
   },
   "adapters": {
-    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.89/cdt-gdb-vscode-0.0.89.tgz"
+    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.90-theia.2/cdt-gdb-vscode-0.0.90-theia.2.tgz"
   }
 }

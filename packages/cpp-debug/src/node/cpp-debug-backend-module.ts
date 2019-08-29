@@ -16,8 +16,10 @@
 
 import { ContainerModule } from 'inversify';
 import { DebugAdapterContribution } from '@theia/debug/lib/common/debug-model';
-import { GdbDebugAdapterContribution } from './cpp-debug-contribution';
+import { debugAdapterContributions } from './cpp-debug-contribution';
 
 export default new ContainerModule(bind => {
-    bind(DebugAdapterContribution).to(GdbDebugAdapterContribution).inSingletonScope();
+    for (const debugAdapterContribution of debugAdapterContributions) {
+        bind(DebugAdapterContribution).to(debugAdapterContribution).inSingletonScope();
+    }
 });
