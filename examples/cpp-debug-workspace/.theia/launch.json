@@ -7,6 +7,12 @@
             "program": "${workspaceFolder}/build/a",
             "verbose": true,
             "logFile": "/tmp/a.out",
+        },
+        {
+            "name": "cpp local remote",
+            "type": "gdbtarget",
+            "program": "${workspaceFolder}/build/a",
+            "request": "launch"
         }
     ]
 }
