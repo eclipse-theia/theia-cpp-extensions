@@ -24,8 +24,8 @@ SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 
 ## Third-party Content
 
-See overall third-party content notices in the main repository at 
-https://github.com/theia-ide/theia/blob/master/NOTICE.md#third-party-content
+See overall third-party content notices in the main repository at
+https://github.com/eclipse-theia/theia/blob/master/NOTICE.md#third-party-content
 
 ## Cryptography
 
@@ -40,7 +40,7 @@ permitted.
 
 NOTICE:
 
-Please note Electron combines Chromium and Node.js into a single runtime. 
+Please note Electron combines Chromium and Node.js into a single runtime.
 While Electron, Chromium and Node.js are generally licensed under very
 permissive MIT and BSD-3-Clause licenses, both Electron and Chromium distribute
 FFmpeg.  While FFmpeg is under the LGPL-2.1-or-later license it incorporates

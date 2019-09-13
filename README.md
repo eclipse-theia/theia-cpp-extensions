@@ -4,6 +4,17 @@
 
 <h2>ECLIPSE THEIA - C/C++ EXTENSIONS</h2>
 
+<div id="badges" align="center">
+
+  [![Gitpod - Code Now](https://img.shields.io/badge/Gitpod-code%20now-blue.svg?longCache=true)](https://gitpod.io#https://github.com/eclipse-theia/theia-cpp-extensions)
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-curved)](https://github.com/eclipse-theia/theia-cpp-extensions/labels/help%20wanted)
+  [![Build Status](https://api.travis-ci.com/eclipse-theia/theia-cpp-extensions.svg?branch=master)](https://travis-ci.com/eclipse-theia/theia-cpp-extensions)
+  [![Open questions](https://img.shields.io/badge/Open-questions-blue.svg?style=flat-curved)](https://github.com/eclipse-theia/theia-cpp-extensions/labels/question)
+  [![Open bugs](https://img.shields.io/badge/Open-bugs-red.svg?style=flat-curved)](https://github.com/eclipse-theia/theia-cpp-extensions/labels/bug)
+
+
+</div>
+
 </div>
 
 ## Overview
