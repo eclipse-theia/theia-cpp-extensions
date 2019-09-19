@@ -6,6 +6,9 @@
   "command": {
     "run": {
       "stream": true
+    },
+    "publish": {
+      "skipGit": true
     }
   }
 }
