@@ -37,7 +37,7 @@
     "src"
   ],
   "scripts": {
-    "postinstall": "yarn run download",
+    "postinstall": "node -e \"require('@theia/debug/bin/download-adapters.js')\"",
     "prepare": "yarn run clean && yarn run build",
     "download": "download-debug-adapters",
     "clean": "theiaext clean",
