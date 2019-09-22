@@ -49,6 +49,6 @@
     "@theia/ext-scripts": "0.9.0"
   },
   "adapters": {
-    "cortex-debug": "https://github.com/Marus/cortex-debug/releases/download/v0.1.21-test2/cortex-debug-0.1.21-test2.vsix"
+    "cortex-debug": "https://github.com/Marus/cortex-debug/releases/download/V0.2.7/cortex-debug-0.2.7.vsix"
   }
 }
