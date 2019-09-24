@@ -5,3 +5,4 @@ lib
 *-app/*
 !*-app/package.json
 examples/cpp-debug-workspace/build/
+yarn.lock
