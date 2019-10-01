@@ -30,6 +30,7 @@
   "scripts": {
     "prepare": "theia build --mode development",
     "start": "theia start",
+    "test": "true",
     "watch": "theia build --watch --mode development"
   },
   "theia": {

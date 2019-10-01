@@ -2,12 +2,21 @@
   "private": true,
   "name": "parent",
   "version": "0.0.0",
+  "engines": {
+    "yarn": "1.0.x || >=1.2.1",
+    "node": ">=10.2.0 <12"
+  },
   "resolution": {
     "**/@types/node": "~10.3.6"
   },
   "devDependencies": {
-    "lerna": "^2.2.0",
+    "@types/chai": "^4.0.1",
+    "@types/mocha": "^2.2.41",
+    "chai": "^4.1.0",
     "concurrently": "^3.5.0",
+    "lerna": "^2.2.0",
+    "mocha": "^3.4.2",
+    "nyc": "^11.0.3",
     "tslint": "^5.12.0"
   },
   "scripts": {
@@ -21,9 +30,11 @@
     "next:publish": "lerna publish --exact --canary=next --npm-tag=next --yes",
     "publish:check": "node scripts/check-publish.js",
     "test": "yarn test:theia && yarn test:electron && yarn test:browser",
-    "test:theia": "true",
-    "test:electron": "/bin/true",
-    "test:browser": "/bin/true"
+    "test:theia": "run test \"@theia/!(example-)*\" --stream --concurrency=1",
+    "test:browser": "run test \"browser-app\"",
+    "test:electron": "run test \"electron-app\"",
+    "start:browser": "theia rebuild:browser && run start \"browser-app\"",
+    "start:electron": "theia rebuild:electron && run start \"electron-app\""
   },
   "workspaces": [
     "packages/*",
