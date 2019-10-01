@@ -6,3 +6,4 @@ lib
 !*-app/package.json
 examples/cpp-debug-workspace/build/
 yarn.lock
+.nyc_output
