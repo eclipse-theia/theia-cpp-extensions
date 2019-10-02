@@ -49,6 +49,11 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         );
     }
 
+    /**
+     * Resolve the debug configuration.
+     * @param config the debug configuration.
+     * @param workspaceFolderUri the optional workspace folder uri.
+     */
     public async resolveDebugConfiguration(config: DebugConfiguration, workspaceFolderUri?: string): Promise<DebugConfiguration | undefined> {
 
         if (!config.request) {
@@ -135,6 +140,10 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         return config;
     }
 
+    /**
+     * Verify the J-Link configuration.
+     * @param config the debug configuration.
+     */
     private verifyJLinkConfiguration(config: DebugConfiguration): void {
         if (!config.device) {
             // tslint:disable-next-line:max-line-length
@@ -161,6 +170,10 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         if (config.jlinkpath && !config.serverpath) { config.serverpath = config.jlinkpath; }
     }
 
+    /**
+     * Verify the OpenOCD configuration.
+     * @param config the debug configuration.
+     */
     private verifyOpenOCDConfiguration(config: DebugConfiguration): void {
         if (!config.configFiles || config.configFiles.length === 0) {
             throw new Error('At least one OpenOCD Configuration File must be specified.');
@@ -174,6 +187,10 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         if (!config.searchDir || config.searchDir.length === 0) { config.searchDir = []; }
     }
 
+    /**
+     * Verify the st-util configuration.
+     * @param config the debug configuration.
+     */
     private verifySTUtilConfiguration(config: DebugConfiguration): void {
         if (config.rtos) {
             throw new Error('The st-util GDB Server does not have support for the rtos option.');
@@ -187,6 +204,10 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         }
     }
 
+    /**
+     * Verify the PyOCD configuration.
+     * @param config the debug configuration.
+     */
     private verifyPyOCDConfiguration(config: DebugConfiguration): void {
         if (config.rtos) {
             throw new Error('The PyOCD GDB Server does not have support for the rtos option.');
@@ -202,6 +223,10 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         }
     }
 
+    /**
+     * Verify the Black Magic Probe configuration.
+     * @param config the debug configuration.
+     */
     private verifyBMPConfiguration(config: DebugConfiguration): void {
         if (!config.BMPGDBSerialPort) {
             throw new Error('A Serial Port for the Black Magic Probe GDB server is required.');
@@ -220,6 +245,10 @@ export class CortexDebugAdapterContribution extends AbstractVSCodeDebugAdapterCo
         }
     }
 
+    /**
+     * Verify the external configuration.
+     * @param config the debug configuration.
+     */
     private verifyExternalConfiguration(config: DebugConfiguration): void {
         if (config.swoConfig.enabled) {
             config.swoConfig = { enabled: false, ports: [], cpuFrequency: 0, swoFrequency: 0 };

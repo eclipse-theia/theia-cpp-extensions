@@ -44,6 +44,11 @@ export const debugAdapterContributions: Array<{ new (): AbstractVSCodeDebugAdapt
                 );
             }
 
+            /**
+             * Resolve the debug configuration.
+             * @param config the debug configuration.
+             * @param workspaceFolderUri the optional workspace folder uri.
+             */
             async resolveDebugConfiguration(config: DebugConfiguration, workspaceFolderUri?: string): Promise<DebugConfiguration | undefined> {
 
                 switch (config.request) {
@@ -54,6 +59,11 @@ export const debugAdapterContributions: Array<{ new (): AbstractVSCodeDebugAdapt
                 throw new Error(`unknown request: "${config.request}"`);
             }
 
+            /**
+             * Validate the debug configuration.
+             * @param validator the validator function.
+             * @param config the debug configuration.
+             */
             protected validateConfiguration(validator: Ajv.ValidateFunction, config: DebugConfiguration): DebugConfiguration {
                 if (!validator(config)) {
                     throw new Error(validator.errors!.map((error: Ajv.ErrorObject) => error.message).join(' // '));

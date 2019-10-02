@@ -19,6 +19,9 @@ import { AbstractViewContribution, OpenViewArguments } from '@theia/core/lib/bro
 import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core/lib/common';
 import { MemoryView } from './cpp-memory-widget';
 
+/**
+ * Command used to toggle the memory view.
+ */
 export const MemoryCommand: Command = { id: 'cpp.command' };
 
 @injectable()
@@ -35,14 +38,27 @@ export class CppContribution extends AbstractViewContribution<MemoryView> {
         });
     }
 
+    /**
+     * Open the memory view widget.
+     * @param _args optional open view arguments.
+     * @returns a promise resolving to the memory view widget.
+     */
     async openView(_args?: Partial<OpenViewArguments>): Promise<MemoryView> {
         return super.openView({ activate: true });
     }
 
+    /**
+     * Register commands for the contribution.
+     * @param registry the command registry.
+     */
     registerCommands(registry: CommandRegistry): void {
         super.registerCommands(registry);
     }
 
+    /**
+     * Register menus for the contribution.
+     * @param registry the menu model registry.
+     */
     registerMenus(registry: MenuModelRegistry): void {
         super.registerMenus(registry);
     }
