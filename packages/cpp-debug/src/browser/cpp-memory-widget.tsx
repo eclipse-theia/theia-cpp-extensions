@@ -31,6 +31,10 @@ function isPrintable(byte: number): boolean {
  * Type to represent big and little endianness.
  */
 type Endianness = 'le' | 'be';
+/**
+ * Determine if the string has valid endianness.
+ * @param val the
+ */
 function isValidEndianness(val: string): val is Endianness {
     return val === 'le' || val === 'be';
 }
@@ -40,10 +44,16 @@ function isValidEndianness(val: string): val is Endianness {
  */
 // tslint:disable-next-line:no-any
 class ForwardIterator<T = any> implements Iterator<T> {
+    /**
+     * The current next item index.
+     */
     private nextItem: number = 0;
 
     constructor(private array: T[]) { }
 
+    /**
+     * Iterate over the next result.
+     */
     next(): IteratorResult<T> {
         if (this.nextItem < this.array.length) {
             return {
@@ -59,6 +69,9 @@ class ForwardIterator<T = any> implements Iterator<T> {
         }
     }
 
+    /**
+     * Returns instance of the iterator.
+     */
     [Symbol.iterator](): IterableIterator<T> {
         return this;
     }
@@ -66,10 +79,16 @@ class ForwardIterator<T = any> implements Iterator<T> {
 
 // tslint:disable-next-line:no-any
 class ReverseIterator<T = any> implements Iterator<T> {
+    /**
+     * The current next item index.
+     */
     private nextItem = this.array.length - 1;
 
     constructor(private array: T[]) { }
 
+    /**
+     * Iterate over the next result.
+     */
     next(): IteratorResult<T> {
         if (this.nextItem >= 0) {
             return {
@@ -85,6 +104,9 @@ class ReverseIterator<T = any> implements Iterator<T> {
         }
     }
 
+    /**
+     * Return an instance of the iterator.
+     */
     [Symbol.iterator](): IterableIterator<T> {
         return this;
     }
@@ -92,32 +114,85 @@ class ReverseIterator<T = any> implements Iterator<T> {
 
 @injectable()
 export class MemoryView extends ReactWidget {
-
+    /**
+     * The memory view ID.
+     */
     static readonly ID = 'memory.view';
+    /**
+     * The memory view label.
+     */
     static readonly LABEL = 'Memory';
 
+    /**
+     * The location field ID.
+     */
     static readonly LOCATION_FIELD_ID = 't-mv-location';
+    /**
+     * The location field offset ID.
+     */
     static readonly LOCATION_OFFSET_FIELD_ID = 't-mv-location-offset';
+    /**
+     * The length field ID.
+     */
     static readonly LENGTH_FIELD_ID = 't-mv-length';
+    /**
+     * The bytes per row field ID.
+     */
     static readonly BYTES_PER_ROW_FIELD_ID = 't-mv-bytesrow';
+    /**
+     * The bytes per group field ID.
+     */
     static readonly BYTES_PER_GROUP_FIELD_ID = 't-mv-bytesgroup';
+    /**
+     * The little endian button ID.
+     */
     static readonly LITTLE_ENDIAN_BUTTON_ID = 't-mv-little-endian';
+    /**
+     * The big endian button ID.
+     */
     static readonly BIG_ENDIAN_BUTTON_ID = 't-mv-big-endian';
+    /**
+     * The endianness button name.
+     */
     static readonly ENDIANNESS_BUTTONS_NAME = 't-mv-endianness';
 
+    /**
+     * The current memory read result.
+     */
     protected memoryReadResult: MemoryReadResult | undefined = undefined;
+    /**
+     * The current read result offset.
+     */
     protected memoryReadResultOffset: number = 0;
-    // If bytes is undefined, this string explains why.
+    /**
+     * The memory read error message.
+     * If bytes is `undefined`, the message explains why.
+     */
     protected memoryReadError: string = 'No memory contents currently available.';
 
     // Parameters for the rendering of the memory contents.
+    /**
+     * The current bytes per row.
+     */
     protected bytesPerRow: number = 16;
+    /**
+     * The current bytes per group.
+     */
     protected bytesPerGroup: number = 1;
+    /**
+     * The current endianness.
+     */
     protected endianness: Endianness = 'le';
 
+    /**
+     * Injected memory provider.
+     */
     @inject(MemoryProvider)
     protected readonly memoryProvider!: MemoryProvider;
 
+    /**
+     * Initialize the widget.
+     */
     @postConstruct()
     protected async init(): Promise<void> {
         this.id = MemoryView.ID;
@@ -127,15 +202,22 @@ export class MemoryView extends ReactWidget {
         this.update();
     }
 
+    /**
+     * Handle the `activateRequest` message.
+     * @param msg the activation request message.
+     */
     protected onActivateRequest(msg: Message): void {
         super.onActivateRequest(msg);
         this.focusLocationField();
     }
 
+    /**
+     * Getter for location offset.
+     */
     protected get locationOffset(): number {
-        const locationOffssetField = this.findLocationOffsetField();
-        if (locationOffssetField) {
-            const locationOffset = parseInt(locationOffssetField.value);
+        const locationOffsetField = this.findLocationOffsetField();
+        if (locationOffsetField) {
+            const locationOffset = parseInt(locationOffsetField.value);
             if (isNaN(locationOffset)) {
                 return this.locationOffset = 0;
             }
@@ -144,6 +226,9 @@ export class MemoryView extends ReactWidget {
         return 0;
     }
 
+    /**
+     * Setter for location offset.
+     */
     protected set locationOffset(value: number) {
         const locationOffsetField = this.findLocationOffsetField();
         if (locationOffsetField) {
@@ -151,6 +236,10 @@ export class MemoryView extends ReactWidget {
         }
     }
 
+    /**
+     * Find the HTML input field given the id.
+     * @param id the id for the HTML element.
+     */
     protected findField(id: string): HTMLInputElement | undefined {
         const field = document.getElementById(id);
         if (field === null) {
@@ -160,18 +249,30 @@ export class MemoryView extends ReactWidget {
         return field as HTMLInputElement;
     }
 
+    /**
+     * Find the location field.
+     */
     protected findLocationField(): HTMLInputElement | undefined {
         return this.findField(MemoryView.LOCATION_FIELD_ID);
     }
 
+    /**
+     * Find the location offset field.
+     */
     protected findLocationOffsetField(): HTMLInputElement | undefined {
         return this.findField(MemoryView.LOCATION_OFFSET_FIELD_ID);
     }
 
+    /**
+     * Find the location length field.
+     */
     protected findLengthField(): HTMLInputElement | undefined {
         return this.findField(MemoryView.LENGTH_FIELD_ID);
     }
 
+    /**
+     * Set focus on the location field.
+     */
     protected focusLocationField(): void {
         const input = this.findLocationField();
         if (input) {
@@ -180,6 +281,9 @@ export class MemoryView extends ReactWidget {
         }
     }
 
+    /**
+     * Render the widget.
+     */
     protected render(): React.ReactNode {
         return <div className='t-mv-container'>
             {this.renderInputContainer()}
@@ -188,6 +292,9 @@ export class MemoryView extends ReactWidget {
         </div>;
     }
 
+    /**
+     * Render the input container for the widget.
+     */
     protected renderInputContainer(): React.ReactNode {
         return <div id='t-mv-wrapper'>
             <div className='t-mv-group'>
@@ -279,6 +386,10 @@ export class MemoryView extends ReactWidget {
         </div>;
     }
 
+    /**
+     * Render the error message.
+     * @param msg the error message.
+     */
     protected renderErrorMessage(msg: string): React.ReactNode {
         return <div className='t-mv-error'>
             <i className='fa fa-warning t-mv-error-icon'></i>
@@ -286,6 +397,9 @@ export class MemoryView extends ReactWidget {
         </div>;
     }
 
+    /**
+     * Render the table view for the widget.
+     */
     protected renderView(): React.ReactNode {
         if (this.memoryReadResult === undefined) {
             return this.renderErrorMessage(this.memoryReadError);
@@ -314,6 +428,11 @@ export class MemoryView extends ReactWidget {
         </div>;
     }
 
+    /**
+     * Get the offseted bytes.
+     * @param bytes the bytes.
+     * @param offset the offset.
+     */
     protected *offsetedBytes(bytes: Uint8Array, offset: number): Iterable<number | undefined> {
         for (let i = 0; i < bytes.length; i++) {
             if (i < -offset || i > bytes.length + -offset) {
@@ -324,6 +443,10 @@ export class MemoryView extends ReactWidget {
         }
     }
 
+    /**
+     * Render the table rows.
+     * @param result the memory read result.
+     */
     protected renderViewRows(result: MemoryReadResult): React.ReactNode {
         const locationOffset = this.locationOffset;
         const locationOffsetDelta = locationOffset - this.memoryReadResultOffset;
@@ -398,6 +521,9 @@ export class MemoryView extends ReactWidget {
             </tr>);
     }
 
+    /**
+     * Handle navigation through the mouse scroll-wheel.
+     */
     protected onWheelMemoryView = (event: React.WheelEvent) => {
         if (this.memoryReadResult) {
             const { scrollTop } = event.currentTarget;
@@ -422,6 +548,9 @@ export class MemoryView extends ReactWidget {
         }
     }
 
+    /**
+     * Handle navigation through the keyboard.
+     */
     protected onKeyboardMemoryView = (event: React.KeyboardEvent) => {
         if (this.memoryReadResult) {
             const { scrollTop } = event.currentTarget;
@@ -452,6 +581,9 @@ export class MemoryView extends ReactWidget {
         }
     }
 
+    /**
+     * Perform widget refresh.
+     */
     protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
         if ('key' in event && event.key !== 'Enter') {
             return;
@@ -459,7 +591,13 @@ export class MemoryView extends ReactWidget {
         this.updateMemoryView();
     }
 
+    /**
+     * Update the memory view.
+     */
     protected updateMemoryView = debounce(this.doUpdateMemoryView.bind(this), 200);
+    /**
+     * Actually update the memory view.
+     */
     protected doUpdateMemoryView(): void {
 
         // Remove results from previous run.
@@ -502,6 +640,9 @@ export class MemoryView extends ReactWidget {
             });
     }
 
+    /**
+     * Handle location change event.
+     */
     protected onLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const locationOffsetField = this.findLocationOffsetField();
         if (locationOffsetField) {
@@ -510,6 +651,9 @@ export class MemoryView extends ReactWidget {
         }
     }
 
+    /**
+     * Handle offset change event.
+     */
     protected onLocationOffsetChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         if (!/^\d*$/.test(value)) {
@@ -520,6 +664,9 @@ export class MemoryView extends ReactWidget {
     }
 
     // Callbacks for when the various view parameters change.
+    /**
+     * Handle bytes per row changed event.
+     */
     protected onBytesPerRowChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         if (!/^[0-9]*$/.test(value)) {
@@ -530,11 +677,17 @@ export class MemoryView extends ReactWidget {
         this.update();
     }
 
+    /**
+     * Handle bytes per group changed event.
+     */
     protected onBytesPerGroupChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         this.bytesPerGroup = parseInt(event.target.value, 10);
         this.update();
     }
 
+    /**
+     * Handle endianness changed event.
+     */
     protected onEndiannessChange = (event: React.FormEvent<HTMLInputElement>) => {
         const value = event.currentTarget.value;
         if (isValidEndianness(value)) {

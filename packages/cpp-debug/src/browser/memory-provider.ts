@@ -17,12 +17,24 @@
 import { injectable, inject } from 'inversify';
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
 
+/**
+ * Representation of a memory read result.
+ */
 export interface MemoryReadResult {
+    /**
+     * The bytes for the read result.
+     */
     bytes: Uint8Array,
+    /**
+     * The address for the read result.
+     */
     address: number,
 }
 
 export const MemoryProvider = Symbol('MemoryProvider');
+/**
+ * Representation of a memory provider.
+ */
 export interface MemoryProvider {
     /**
      * Read `number` bytes of memory at address `location`, which can be
@@ -53,9 +65,18 @@ function hex2bytes(hex: string): Uint8Array {
 @injectable()
 export class MemoryProviderImpl implements MemoryProvider {
 
+    /**
+     * Injected debug session manager.
+     */
     @inject(DebugSessionManager)
     protected readonly debugSessionManager!: DebugSessionManager;
 
+    /**
+     * Read the memory for the given parameters.
+     * @param location the location.
+     * @param length the length.
+     * @param offset the offset.
+     */
     async readMemory(location: string, length: number, offset: number = 0): Promise<MemoryReadResult> {
         const session = this.debugSessionManager.currentSession;
         if (session === undefined) {

@@ -14,6 +14,7 @@
       true,
       "check-space"
     ],
+    "completed-docs": [true, "enums", "enum-members", "functions", "interfaces", "methods", "properties"],
     "curly": true,
     "eofline": true,
     "file-header": [
@@ -83,6 +84,7 @@
     },
     "no-magic-numbers": false,
     "no-null-keyword": true,
+    "no-redundant-jsdoc": true,
     "no-shadowed-variable": true,
     "no-string-throw": true,
     "no-trailing-whitespace": true,
