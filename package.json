@@ -12,14 +12,22 @@
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/mocha": "^2.2.41",
+    "@types/webdriverio": "^4.7.0",
     "chai": "^4.1.0",
     "concurrently": "^3.5.0",
     "lerna": "^2.2.0",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
+    "reflect-metadata": "^0.1.10",
+    "temp": "^0.8.3",
+    "ts-node": "<7.0.0",
     "tslint": "^5.12.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3"
+    "typescript": "^3",
+    "wdio-mocha-framework": "0.6.4",
+    "wdio-selenium-standalone-service": "0.0.12",
+    "wdio-spec-reporter": "0.1.5",
+    "webdriverio": "4.14.1"
   },
   "scripts": {
     "prepare": "lerna run prepare",
