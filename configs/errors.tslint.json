@@ -78,7 +78,8 @@
           "vscode-languageserver-types",
           "vscode-uri",
           "vscode-ws-jsonrpc",
-          "yargs"
+          "yargs",
+          "webdriverio"
         ]
       ]
     },
