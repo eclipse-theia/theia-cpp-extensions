@@ -1,0 +1,26 @@
+{
+  "extends": "./configs/base.tsconfig",
+  "compilerOptions": {
+    "skipLibCheck": false,
+    "baseUrl": ".",
+    "paths": {
+      "@theia/cpp-debug/lib/*": [
+        "packages/cpp-debug/src/*"
+      ],
+      "@theia/cortex-debug/lib/*": [
+        "packages/cortex-debug/src/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "tslint-language-service"
+      }
+    ]
+  },
+  "include": [
+    "dev-packages/*/src",
+    "packages/*/src",
+    "browser-app/*/test",
+    "electron-app/*/test"
+  ]
+}
