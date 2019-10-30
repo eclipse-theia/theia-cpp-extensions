@@ -6,9 +6,6 @@
     "paths": {
       "@theia/cpp-debug/lib/*": [
         "packages/cpp-debug/src/*"
-      ],
-      "@theia/cortex-debug/lib/*": [
-        "packages/cortex-debug/src/*"
       ]
     },
     "plugins": [
