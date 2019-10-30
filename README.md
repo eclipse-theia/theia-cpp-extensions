@@ -21,8 +21,6 @@
 Collection of Theia extensions related to C/C++ development.
 
 ## Features
-- `@theia/cortex-debug`:
-   - Debugging support for ARM Cortex-M Microcontrollers.
 - `@theia/cpp-debug`:
    - Debugging support using `GDB` through the `cdt-gdb-vscode` extension.
    - Memory view (monitor process memory during debug sessions).

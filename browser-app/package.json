@@ -20,8 +20,7 @@
     "@theia/terminal": "next",
     "@theia/textmate-grammars": "next",
     "@theia/typescript": "next",
-    "@theia/workspace": "next",
-    "@theia/cortex-debug": "0.7.0"
+    "@theia/workspace": "next"
   },
   "devDependencies": {
     "@theia/cli": "next"
