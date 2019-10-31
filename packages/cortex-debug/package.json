@@ -3,7 +3,7 @@
   "version": "0.7.0",
   "description": "Theia - Cortex Debug Extension",
   "dependencies": {
-    "@theia/debug": "next"
+    "@theia/debug": "latest"
   },
   "publishConfig": {
     "access": "public"
