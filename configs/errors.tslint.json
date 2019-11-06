@@ -14,7 +14,14 @@
       true,
       "check-space"
     ],
-    "completed-docs": [true, "enums", "enum-members", "functions", "interfaces", "methods", "properties"],
+    "completed-docs": [
+      true,
+      "enums",
+      "enum-members",
+      "functions",
+      "interfaces",
+      "methods"
+    ],
     "curly": true,
     "eofline": true,
     "file-header": [

@@ -4,6 +4,9 @@
     "skipLibCheck": false,
     "baseUrl": ".",
     "paths": {
+      "@theia/cpp/lib/*": [
+        "packages/cpp/src/*"
+      ],
       "@theia/cpp-debug/lib/*": [
         "packages/cpp-debug/src/*"
       ]
