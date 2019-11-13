@@ -6,6 +6,8 @@
 
 The workspace provides an easy and reproducible way to test the functionality present in the `@theia/cpp-debug` extension.
 
+note: ATM debugging does not work in Gitpod. Since GDB uses ptrace to attach to the debuggee and ptrace requires the docker container to be started with special permissions.
+
 ### Key Features
 
 1. `a.cpp`: simple C/C++ program for debug purposes
