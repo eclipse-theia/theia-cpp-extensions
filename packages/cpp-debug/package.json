@@ -3,8 +3,8 @@
   "version": "0.13.0",
   "description": "Theia - C/C++ Debug Extension",
   "dependencies": {
-    "@theia/core": "latest",
-    "@theia/debug": "latest",
+    "@theia/core": "next",
+    "@theia/debug": "next",
     "ajv": "^6.5.3",
     "lodash": "^4.17.10"
   },
