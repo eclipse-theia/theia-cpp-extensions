@@ -8,6 +8,7 @@
     "@theia/cpp-debug": "0.13.0",
     "@theia/editor": "next",
     "@theia/electron": "next",
+    "@theia/file-search": "next",
     "@theia/filesystem": "next",
     "@theia/json": "next",
     "@theia/languages": "next",
