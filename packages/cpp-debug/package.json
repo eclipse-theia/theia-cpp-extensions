@@ -1,10 +1,10 @@
 {
   "name": "@theia/cpp-debug",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Theia - C/C++ Debug Extension",
   "dependencies": {
-    "@theia/core": "next",
-    "@theia/debug": "next",
+    "@theia/core": "latest",
+    "@theia/debug": "latest",
     "ajv": "^6.5.3",
     "lodash": "^4.17.10"
   },
