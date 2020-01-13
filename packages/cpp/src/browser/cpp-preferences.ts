@@ -56,11 +56,6 @@ export const cppPreferencesSchema: PreferenceSchema = {
             default: false,
             type: 'boolean'
         },
-        'cpp.experimentalCommands': {
-            description: 'Enable experimental commands mostly intended for Clangd developers.',
-            default: false,
-            type: 'boolean'
-        },
         'cpp.clangdExecutable': {
             description: 'Specify the executable name/path to run in order to start clangd.',
             default: CLANGD_EXECUTABLE_DEFAULT,
@@ -90,7 +85,6 @@ export const cppPreferencesSchema: PreferenceSchema = {
 export class CppConfiguration {
     'cpp.buildConfigurations': CppBuildConfiguration[];
     'cpp.experimentalCompilationDatabaseMap': boolean;
-    'cpp.experimentalCommands': boolean;
     'cpp.clangdExecutable': string;
     'cpp.clangdArgs': string;
     'cpp.clangTidy': boolean;
