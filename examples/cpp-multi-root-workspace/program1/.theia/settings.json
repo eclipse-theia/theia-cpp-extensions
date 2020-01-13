@@ -1,0 +1,8 @@
+{
+  "cpp.buildConfigurations": [
+    {
+      "name": "A",
+      "directory": "/tmp/build/theia-cpp-test/program1"
+    }
+  ]
+}

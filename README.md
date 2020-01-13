@@ -46,6 +46,8 @@ provided by the repository.
 ## Example Workspaces
 - [`cpp-debug-workspace`](./examples/cpp-debug-workspace/README.md)
     - provides an easy and reproducible way to test the functionality present in the `@theia/cpp-debug` extension. Includes a simple C/C++ program, debug launch configuration file (`launch.json`), and a task in order to compile the program (`tasks.json`).
+- [`cpp-multi-root-workspace`](./examples/cpp-multi-root-workspace/README.md)
+    - provides an easy and reproducible way to test multiple-root support provided by the `@theia/cpp` extension.
 
 ## License
 
