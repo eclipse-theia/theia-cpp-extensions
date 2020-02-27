@@ -34,7 +34,7 @@
     "webdriverio": "4.14.1"
   },
   "scripts": {
-    "prepare": "lerna run prepare",
+    "prepare": "lerna run prepare && yarn download:plugins",
     "rebuild:browser": "theia rebuild:browser",
     "rebuild:electron": "theia rebuild:electron",
     "watch": "lerna run watch --parallel",
@@ -48,7 +48,8 @@
     "test:browser": "run test \"browser-app\"",
     "test:electron": "run test \"electron-app\"",
     "start:browser": "theia rebuild:browser && run start \"browser-app\"",
-    "start:electron": "theia rebuild:electron && run start \"electron-app\""
+    "start:electron": "theia rebuild:electron && run start \"electron-app\"",
+    "download:plugins": "theia download:plugins"
   },
   "workspaces": [
     "packages/*",
@@ -60,5 +61,14 @@
     "vscode-languageserver-protocol": "3.15.0-next.9",
     "vscode-languageserver-types": "3.15.0-next.5",
     "**/vscode-json-languageserver/**/vscode-languageserver": "6.0.0-next.1"
+  },
+  "theiaPluginsDir": "plugins",
+  "theiaPlugins": {
+    "vscode-builtin-cpp": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/cpp-1.39.1-prel.vsix",
+    "vscode-builtin-json": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/json-1.39.1-prel.vsix",
+    "vscode-builtin-markdown": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/markdown-1.39.1-prel.vsix",
+    "vscode-builtin-npm": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/npm-1.39.1-prel.vsix",
+    "vscode-builtin-typescript": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/typescript-1.39.1-prel.vsix",
+    "vscode-builtin-typescript-language-features": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/typescript-language-features-1.39.1-prel.vsix"
   }
 }

@@ -9,3 +9,4 @@
 /**/webpack.config.js
 /**/yarn.lock
 gen-webpack.config.js
+/**/plugins

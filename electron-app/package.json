@@ -16,12 +16,11 @@
     "@theia/messages": "next",
     "@theia/monaco": "next",
     "@theia/navigator": "next",
+    "@theia/plugin-ext-vscode": "next",
     "@theia/preferences": "next",
     "@theia/process": "next",
     "@theia/task": "next",
     "@theia/terminal": "next",
-    "@theia/textmate-grammars": "next",
-    "@theia/typescript": "next",
     "@theia/workspace": "next"
   },
   "devDependencies": {
@@ -29,7 +28,7 @@
   },
   "scripts": {
     "prepare": "theia build --mode development",
-    "start": "theia start",
+    "start": "theia start --plugins=local-dir:../plugins",
     "test": "true",
     "watch": "theia build --watch --mode development"
   },
