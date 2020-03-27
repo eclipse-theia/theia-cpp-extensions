@@ -64,11 +64,11 @@
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
-    "vscode-builtin-cpp": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/cpp-1.39.1-prel.vsix",
-    "vscode-builtin-json": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/json-1.39.1-prel.vsix",
-    "vscode-builtin-markdown": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/markdown-1.39.1-prel.vsix",
-    "vscode-builtin-npm": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/npm-1.39.1-prel.vsix",
-    "vscode-builtin-typescript": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/typescript-1.39.1-prel.vsix",
-    "vscode-builtin-typescript-language-features": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/typescript-language-features-1.39.1-prel.vsix"
+    "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.43.2/file/vscode.cpp-1.43.2.vsix",
+    "vscode-builtin-json": "https://open-vsx.org/api/vscode/json/1.39.1/file/vscode.json-1.39.1.vsix",
+    "vscode-builtin-markdown": "https://open-vsx.org/api/vscode/markdown/1.39.1/file/vscode.markdown-1.39.1.vsix",
+    "vscode-builtin-npm": "https://open-vsx.org/api/vscode/npm/1.39.1/file/vscode.npm-1.39.1.vsix",
+    "vscode-builtin-typescript": "https://open-vsx.org/api/vscode/typescript/1.39.1/file/vscode.typescript-1.39.1.vsix",
+    "vscode-builtin-typescript-language-features": "https://open-vsx.org/api/vscode/typescript-language-features/1.39.1/file/vscode.typescript-language-features-1.39.1.vsix"
   }
 }
