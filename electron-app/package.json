@@ -21,6 +21,7 @@
     "@theia/process": "next",
     "@theia/task": "next",
     "@theia/terminal": "next",
+    "@theia/typehierarchy": "next",
     "@theia/workspace": "next"
   },
   "devDependencies": {
