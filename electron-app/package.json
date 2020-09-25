@@ -2,6 +2,17 @@
   "private": true,
   "name": "electron-app",
   "version": "1.0.0",
+  "theia": {
+    "target": "browser",
+    "frontend": {
+      "config": {
+        "applicationName": "Theia C/C++ Extensions Example",
+        "preferences": {
+          "debug.inlineValues": true
+        }
+      }
+    }
+  },
   "dependencies": {
     "@theia/core": "next",
     "@theia/cpp-debug": "1.0.0",
@@ -29,8 +40,5 @@
     "start": "theia start --plugins=local-dir:../plugins",
     "test": "true",
     "watch": "theia build --watch --mode development"
-  },
-  "theia": {
-    "target": "electron"
   }
 }
