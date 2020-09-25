@@ -42,11 +42,11 @@
     "src"
   ],
   "scripts": {
-    "prepare": "yarn run clean && yarn run build",
+    "prepare": "echo \"'@theia/cpp' build skipped.\"",
     "clean": "theiaext clean",
     "build": "theiaext build",
     "watch": "theiaext watch",
-    "test": "theiaext test"
+    "test": "true"
   },
   "devDependencies": {
     "@theia/ext-scripts": "^0.12.0"

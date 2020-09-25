@@ -24,6 +24,9 @@ Collection of Theia extensions related to C/C++ development.
 - `@theia/cpp-debug`:
    - Debugging support using `GDB` through the `cdt-gdb-vscode` extension.
    - Memory view (monitor process memory during debug sessions).
+- `@theia/cpp` **deprecated**: 
+   - **Deprecated** C/C++ language-features extension.\
+   (Language-features should instead be contributed by VS Code extensions).
 
 ## How to build
 The `browser-app` and `electron-app` directories contain examples of Theia-based applications which use the extensions

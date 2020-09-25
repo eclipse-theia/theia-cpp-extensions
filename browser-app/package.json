@@ -4,13 +4,10 @@
   "version": "1.0.0",
   "dependencies": {
     "@theia/core": "next",
-    "@theia/cpp": "1.0.0",
     "@theia/cpp-debug": "1.0.0",
     "@theia/editor": "next",
     "@theia/file-search": "next",
     "@theia/filesystem": "next",
-    "@theia/json": "next",
-    "@theia/languages": "next",
     "@theia/markers": "next",
     "@theia/messages": "next",
     "@theia/monaco": "next",
