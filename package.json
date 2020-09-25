@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "engines": {
     "yarn": "1.0.x || >=1.2.1",
-    "node": ">=10.2.0 <12"
+    "node": ">=12.14.1 <13"
   },
   "resolution": {
-    "**/@types/node": "~10.3.6"
+    "**/@types/node": "12"
   },
   "devDependencies": {
     "@types/chai": "^4.0.1",
     "@types/jsdom": "^11.0.4",
     "@types/mocha": "^2.2.41",
+    "@types/node": "12",
     "@types/webdriverio": "^4.7.0",
     "chai": "^4.1.0",
     "concurrently": "^3.5.0",
@@ -27,11 +28,7 @@
     "ts-node": "<7.0.0",
     "tslint": "^5.12.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3",
-    "wdio-mocha-framework": "0.6.4",
-    "wdio-selenium-standalone-service": "0.0.12",
-    "wdio-spec-reporter": "0.1.5",
-    "webdriverio": "4.14.1"
+    "typescript": "^3"
   },
   "scripts": {
     "prepare": "lerna run prepare && yarn download:plugins",
@@ -64,6 +61,7 @@
     "vscode-builtin-markdown": "https://open-vsx.org/api/vscode/markdown/1.39.1/file/vscode.markdown-1.39.1.vsix",
     "vscode-builtin-npm": "https://open-vsx.org/api/vscode/npm/1.39.1/file/vscode.npm-1.39.1.vsix",
     "vscode-builtin-typescript": "https://open-vsx.org/api/vscode/typescript/1.39.1/file/vscode.typescript-1.39.1.vsix",
-    "vscode-builtin-typescript-language-features": "https://open-vsx.org/api/vscode/typescript-language-features/1.39.1/file/vscode.typescript-language-features-1.39.1.vsix"
+    "vscode-builtin-typescript-language-features": "https://open-vsx.org/api/vscode/typescript-language-features/1.39.1/file/vscode.typescript-language-features-1.39.1.vsix",
+    "vscode-clangd": "https://open-vsx.org/api/llvm-vs-code-extensions/vscode-clangd/0.1.5/file/llvm-vs-code-extensions.vscode-clangd-0.1.5.vsix"
   }
 }
