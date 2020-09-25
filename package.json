@@ -57,11 +57,6 @@
     "electron-app",
     "dev-packages/*"
   ],
-  "resolutions": {
-    "vscode-languageserver-protocol": "3.15.0-next.9",
-    "vscode-languageserver-types": "3.15.0-next.5",
-    "**/vscode-json-languageserver/**/vscode-languageserver": "6.0.0-next.1"
-  },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
     "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.43.2/file/vscode.cpp-1.43.2.vsix",
