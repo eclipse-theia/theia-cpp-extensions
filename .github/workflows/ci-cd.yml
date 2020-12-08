@@ -70,6 +70,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Pre-Publish 
         shell: bash
@@ -82,7 +83,7 @@ jobs:
         uses: nick-invision/retry@v2
         with:
           timeout_minutes: 5
-          retry_wait_seconds: 30
+          retry_wait_seconds: 60
           max_attempts: 3
           retry_on: error
           command: yarn run publish:next
