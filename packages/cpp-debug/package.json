@@ -54,6 +54,6 @@
     "zlib": "^1.0.5"
   },
   "adapters": {
-    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.90-theia.2/cdt-gdb-vscode-0.0.90-theia.2.tgz"
+    "cdt-gdb-vscode": "https://github.com/bohemondcouka/cdt-gdb-vscode/archive/test.tar.gz"
   }
 }
