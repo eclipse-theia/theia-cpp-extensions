@@ -18,11 +18,12 @@ import { injectable } from 'inversify';
 import { AbstractViewContribution, OpenViewArguments } from '@theia/core/lib/browser';
 import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core/lib/common';
 import { MemoryView } from './cpp-memory-widget';
-
+import { InfoView } from './cpp-info-widget';
 /**
  * Command used to toggle the memory view.
  */
 export const MemoryCommand: Command = { id: 'cpp.command' };
+export const InfoCommand: Command = { id: 'cpp.info.command' };
 
 @injectable()
 export class CppContribution extends AbstractViewContribution<MemoryView> {
@@ -44,6 +45,48 @@ export class CppContribution extends AbstractViewContribution<MemoryView> {
      * @returns a promise resolving to the memory view widget.
      */
     async openView(_args?: Partial<OpenViewArguments>): Promise<MemoryView> {
+        return super.openView({ activate: true });
+    }
+
+    /**
+     * Register commands for the contribution.
+     * @param registry the command registry.
+     */
+    registerCommands(registry: CommandRegistry): void {
+        super.registerCommands(registry);
+    }
+
+    /**
+     * Register menus for the contribution.
+     * @param registry the menu model registry.
+     */
+    registerMenus(registry: MenuModelRegistry): void {
+        super.registerMenus(registry);
+    }
+}
+
+@injectable()
+export class CppContributionInfo extends AbstractViewContribution<InfoView> {
+
+    constructor() {
+        super({
+            widgetId: InfoView.ID,
+            widgetName: InfoView.LABEL,
+            defaultWidgetOptions: {
+                area: 'bottom'
+            },
+            toggleCommandId: InfoCommand.id,
+        });
+        console.log('Constructor CppContributionInfo');
+    }
+
+    /**
+     * Open the memory view widget.
+     * @param _args optional open view arguments.
+     * @returns a promise resolving to the memory view widget.
+     */
+    async openView(_args?: Partial<OpenViewArguments>): Promise<InfoView> {
+        console.log('openView CppContributionInfo');
         return super.openView({ activate: true });
     }
 
