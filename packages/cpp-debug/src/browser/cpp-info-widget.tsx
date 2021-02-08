@@ -19,6 +19,17 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser';
 import { debounce } from 'lodash';
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
+/**
+ * Agent content interface.
+ */
+interface AgentContents {
+    id: string;
+    'target-id': string;
+    name: string;
+    cores: string,
+    threads: string;
+    location_id: string;
+}
 
 @injectable()
 export class InfoView extends ReactWidget {
@@ -31,9 +42,41 @@ export class InfoView extends ReactWidget {
      */
     static readonly LABEL = 'Info';
     /**
-     * Texte pour des tests.
+     *
      */
-    protected texte: string = 'Rien';
+    protected agentsList: Array<AgentContents>;
+    /**
+     * Number of the selected agent in the agent's list.
+     */
+    protected agentSelected: number = 0;
+    /**
+     * ID of the selected agent.
+     */
+    protected agentId: string;
+    /**
+     * Target ID of the selected agent.
+     */
+    protected agentTargetId: string;
+    /**
+     * Name of the selected agent.
+     */
+    protected agentName: string;
+    /**
+     * Cores of the selected agent.
+     */
+    protected agentCores: string;
+    /**
+     * Threads of the selected agent.
+     */
+    protected agentThreads: string;
+    /**
+     * Location ID of the selected agent.
+     */
+    protected agentLocationId: string;
+    /**
+     *
+     */
+    protected buttonGetAgents: React.ReactNode = <button className='theia-button' onClick={() => this.getAgents()} style={{ width: '100px' }}>GetAgents</button>;
     /**
      * The DebugSessionManager :)
      */
@@ -45,7 +88,6 @@ export class InfoView extends ReactWidget {
      */
     @postConstruct()
     protected async init(): Promise<void> {
-        console.log('init');
         this.id = InfoView.ID;
         this.title.label = InfoView.LABEL;
         this.title.caption = InfoView.LABEL;
@@ -54,20 +96,10 @@ export class InfoView extends ReactWidget {
     }
 
     /**
-     * Handle the `activateRequest` message.
-     * @param msg the activation request message.
-     */
-    protected onActivateRequest(msg: Message): void {
-        console.log('onActivateRequest');
-        super.onActivateRequest(msg);
-    }
-
-    /**
      * Find the HTML input field given the id.
      * @param id the id for the HTML element.
      */
     protected findField(id: string): HTMLInputElement | undefined {
-        console.log('findField');
         const field = document.getElementById(id);
         if (field === null) {
             return undefined;
@@ -77,26 +109,52 @@ export class InfoView extends ReactWidget {
     }
 
     /**
+     * Find the location field.
+     */
+    protected findLocationField(): HTMLInputElement | undefined {
+        return this.findField(InfoView.ID);
+    }
+
+    /**
+     * Set focus on the location field.
+     */
+    protected focusLocationField(): void {
+        const input = this.findLocationField();
+        if (input) {
+            (input as HTMLInputElement).focus();
+            (input as HTMLInputElement).select();
+        }
+    }
+
+    /**
+     * Handle the `activateRequest` message.
+     * @param msg the activation request message.
+     */
+    protected onActivateRequest(msg: Message): void {
+        super.onActivateRequest(msg);
+        this.focusLocationField();
+    }
+
+    /**
      * Get the agents informations.
      */
     protected async getAgents(): Promise<void> {
-        console.log('getAgents');
-        console.log('On se fout de moi ?\n');
+        if (this.debugSessionManager === undefined) {
+            throw new Error('No active debug session.');
+        }
         const session = this.debugSessionManager.currentSession;
-        console.log(session);
-        console.log('\n');
         if (session === undefined) {
             throw new Error('No active debug session.');
         }
         try {
-            const result = await session.sendCustomRequest('cdt-gdb-adapter/Agents', {
-            address: 'pouet',
-            length: 2,
-            offset: 0,
-        });
-            console.log('Patapouet ?');
-            console.log(result.body);
-            this.texte = result.body.data;
+            const result = await session.sendCustomRequest('cdt-gdb-adapter/Agents', undefined);
+            this.agentsList = result.body;
+            this.agentId = this.agentsList[0].id;
+            this.agentTargetId = this.agentsList[0]['target-id'];
+            this.agentName = this.agentsList[0].name;
+            this.agentCores = this.agentsList[0].cores;
+            this.agentThreads = this.agentsList[0].threads;
+            this.agentLocationId = this.agentsList[0].location_id;
             this.update();
         } catch (err) {
             console.error(err.message);
@@ -107,23 +165,21 @@ export class InfoView extends ReactWidget {
      * Render the widget.
      */
     protected render(): React.ReactNode {
-        console.log('renderP');
-        this.getAgents();
+        console.log('render');
+        if (this.agentsList === undefined || this.agentsList.length === 0) {
+            return this.renderErrorMessage(' No agents currently running.');
+        }
         return <React.Fragment>
                 <div className='t-mv-container'>
-                 {this.texte}
+                {this.buttonGetAgents}
+                 Id : {this.agentId}<br/>
+                 Target id : {this.agentTargetId}<br/>
+                 Name : {this.agentName}<br/>
+                 Cores : {this.agentCores}<br/>
+                 Threads : {this.agentThreads}<br/>
+                 Location ID : {this.agentLocationId}<br/>
                 </div>
             </React.Fragment>;
-    }
-
-    /**
-     * Render the input container for the widget.
-     */
-    protected renderInputContainer(): React.ReactNode {
-        console.log('renderInputContainer');
-        return <div id='t-iv-wrapper'>
-        <i className='fa fa-warning t-mv-error-icon'></i>
-        </div>;
     }
 
     /**
@@ -134,7 +190,8 @@ export class InfoView extends ReactWidget {
         console.log('renderErrorMessage');
         return <div className='t-iv-error'>
             <i className='fa fa-warning t-iv-error-icon'></i>
-            {msg}
+            {msg}<br/>
+            {this.buttonGetAgents}
         </div>;
     }
 
@@ -163,11 +220,11 @@ export class InfoView extends ReactWidget {
      * Update the info view.
      */
     protected updateInfoView = debounce(this.doUpdateInfoView.bind(this), 200);
+
     /**
      * Actually update the info view.
      */
     protected doUpdateInfoView(): void {
-        console.log('doUpdateInfoView');
         this.update();
         return;
     }
