@@ -1,5 +1,5 @@
 /********************************************************************************
- * Copyright (C) 2018 Ericsson and others.
+ * Copyright (C) 2021 Ericsson and others.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -24,10 +24,10 @@ const adapterPath = join(__dirname, '../../download/cdt-gdb-vscode/package');
 const packageJson = require(join(adapterPath, 'package.json'));
 
 // Create contribution classes (multiple debuggers are being contributed here)
-export const debugAdapterContributions: Array<{ new (): AbstractVSCodeDebugAdapterContribution }> =
+export const debugAdapterContributions: Array<{ new(): AbstractVSCodeDebugAdapterContribution }> =
 
     // `debugger` is a reserved keyword, hence why `d`.
-    // tslint:disable-next-line:no-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (packageJson.contributes.debuggers as any[]).map(d => {
 
         const validators = {

@@ -51,9 +51,10 @@
   "devDependencies": {
     "@theia/ext-scripts": "^1.1.0",
     "@types/chai": "^4.1.7",
+    "@types/long": "^4.0.0",
     "@types/mocha": "^5.2.0",
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
+    "mocha": "^7.2.0",
     "rimraf": "^2.6.2",
     "tar": "^4.0.0",
     "unzip-stream": "^0.3.0",

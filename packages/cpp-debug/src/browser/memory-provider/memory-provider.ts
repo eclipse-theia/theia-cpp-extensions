@@ -14,24 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { injectable, inject } from 'inversify';
+import { Interfaces } from '../utils/memory-widget-utils';
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
-import * as Long from 'long';
-import { hexStrToUnsignedLong } from '../common/util';
-
-/**
- * Representation of a memory read result.
- */
-export interface MemoryReadResult {
-    /**
-     * The bytes for the read result.
-     */
-    bytes: Uint8Array,
-    /**
-     * The address for the read result.
-     */
-    address: Long,
-}
+import { injectable, inject } from 'inversify';
+import { hexStrToUnsignedLong } from '../../common/util';
 
 export const MemoryProvider = Symbol('MemoryProvider');
 /**
@@ -42,23 +28,20 @@ export interface MemoryProvider {
      * Read `number` bytes of memory at address `location`, which can be
      * any expression evaluating to an address.
      */
-    readMemory(location: string, length: number, offset?: number): Promise<MemoryReadResult>;
-}
+    readMemory(location: string, length: number, offset?: number): Promise<Interfaces.MemoryReadResult>;
 
-/**
- * Representation of a variable range.
- */
-export interface VariableRange {
-    name: string;
-    address: Long;
-    pastTheEndAddress: Long;
+    /**
+     * @param location any expression evaluating to an address.
+     * @param content the new value to write to that address, as a hex-encoded string.
+     */
+    writeMemory?(location: string, content: string): Promise<void>;
 }
 
 /**
  * Convert an hex-encoded string of bytes to the Uint8Array equivalent.
  */
-function hex2bytes(hex: string): Uint8Array {
-    const arr: Uint8Array = new Uint8Array(hex.length / 2);
+export function hex2bytes(hex: string): Interfaces.LabeledUint8Array {
+    const arr: Interfaces.LabeledUint8Array = new Uint8Array(hex.length / 2);
 
     for (let i = 0; i < hex.length / 2; i++) {
         const hexByte = hex.slice(i * 2, i * 2 + 2);
@@ -75,7 +58,6 @@ function hex2bytes(hex: string): Uint8Array {
  */
 @injectable()
 export class MemoryProviderImpl implements MemoryProvider {
-
     /**
      * Injected debug session manager.
      */
@@ -88,7 +70,7 @@ export class MemoryProviderImpl implements MemoryProvider {
      * @param length the length.
      * @param offset the offset.
      */
-    async readMemory(location: string, length: number, offset: number = 0): Promise<MemoryReadResult> {
+    async readMemory(location: string, length: number, offset = 0): Promise<Interfaces.MemoryReadResult> {
         const session = this.debugSessionManager.currentSession;
         if (session === undefined) {
             throw new Error('No active debug session.');
@@ -96,7 +78,7 @@ export class MemoryProviderImpl implements MemoryProvider {
 
         const result = await session.sendCustomRequest('cdt-gdb-adapter/Memory', {
             address: location,
-            length: length,
+            length,
             offset,
         });
 
@@ -105,4 +87,14 @@ export class MemoryProviderImpl implements MemoryProvider {
 
         return { bytes, address };
     }
+
+    // This functionality is not presently available from the CDT-GDB adapter
+    // async writeMemory(address: string, content: string): Promise<void> {
+    //     const { currentSession } = this.debugSessionManager;
+    //     if (!currentSession) {
+    //         throw new Error('No active debug session.');
+    //     }
+
+    //     await currentSession.sendCustomRequest('cdt-gdb-adapter/MemoryWrite', { address, content });
+    // }
 }

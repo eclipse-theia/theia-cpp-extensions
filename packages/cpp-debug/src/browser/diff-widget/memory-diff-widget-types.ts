@@ -14,12 +14,32 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ContainerModule } from 'inversify';
-import { DebugAdapterContribution } from '@theia/debug/lib/common/debug-model';
-import { debugAdapterContributions } from './cpp-debug-backend-contribution';
+import { MemoryTable } from '../memory-widget/memory-table-widget';
+import { VariableDecoration } from '../utils/memory-widget-variable-utils';
 
-export default new ContainerModule(bind => {
-    for (const debugAdapterContribution of debugAdapterContributions) {
-        bind(DebugAdapterContribution).to(debugAdapterContribution).inSingletonScope();
-    }
-});
+export enum DiffLabels {
+    Before = 'before',
+    After = 'after'
+}
+
+export interface RowData {
+    groups: React.ReactNodeArray;
+    variables: VariableDecoration[];
+    ascii: string;
+}
+
+export interface DiffRowOptions {
+    beforeAddress: string;
+    afterAddress: string;
+    before: RowData;
+    after: RowData;
+    doShowDivider: boolean;
+    isModified: boolean;
+}
+
+export interface DiffExtraColumnOptions extends Pick<MemoryTable.RowOptions, 'ascii' | 'variables'> {
+    afterAscii: string;
+    afterVariables: VariableDecoration[];
+    variables: VariableDecoration[];
+    ascii: string;
+}

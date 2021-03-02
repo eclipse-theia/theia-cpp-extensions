@@ -14,12 +14,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ContainerModule } from 'inversify';
-import { DebugAdapterContribution } from '@theia/debug/lib/common/debug-model';
-import { debugAdapterContributions } from './cpp-debug-backend-contribution';
+.register-table-widget table.t-mv-view {
+    table-layout: fixed;
+    width: 100%;
+}
 
-export default new ContainerModule(bind => {
-    for (const debugAdapterContribution of debugAdapterContributions) {
-        bind(DebugAdapterContribution).to(debugAdapterContribution).inSingletonScope();
-    }
-});
+.register-table-widget table.t-mv-view td,
+.register-table-widget table.t-mv-view th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reg-options-widget .t-mv-group.view-group {
+    grid-template-columns: 3fr 2fr 30px;
+}
+
+.reg-options-widget .multi-select-bar {
+    height:100%;
+}
