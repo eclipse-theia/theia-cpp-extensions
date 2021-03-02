@@ -6,7 +6,7 @@
             "type": "gdb",
             "program": "${workspaceFolder}/build/a",
             "verbose": true,
-            "logFile": "/tmp/a.out",
+            "logFile": "/tmp/a.out"
         },
         {
             "name": "cpp local remote",

@@ -1,0 +1,50 @@
+{
+  "private": true,
+  "name": "@theia/example-browser",
+  "version": "1.10.0",
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
+  "theia": {
+    "frontend": {
+      "config": {
+        "applicationName": "Theia Browser Example",
+        "preferences": {
+          "files.enableTrash": false
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@theia/core": "next",
+    "@theia/cpp-debug": "1.0.0",
+    "@theia/editor": "next",
+    "@theia/file-search": "next",
+    "@theia/filesystem": "next",
+    "@theia/markers": "next",
+    "@theia/messages": "next",
+    "@theia/monaco": "next",
+    "@theia/navigator": "next",
+    "@theia/plugin-ext-vscode": "next",
+    "@theia/preferences": "next",
+    "@theia/process": "next",
+    "@theia/task": "next",
+    "@theia/terminal": "next",
+    "@theia/typehierarchy": "next",
+    "@theia/workspace": "next"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn build",
+    "clean": "theia clean",
+    "build": "theia build --mode development",
+    "watch": "yarn build --watch",
+    "start": "theia start --plugins=local-dir:../../plugins",
+    "start:debug": "yarn start --log-level=debug",
+    "test": "theia test . --plugins=local-dir:../../plugins --test-spec=../api-tests/**/*.spec.js",
+    "test:debug": "yarn test --test-inspect",
+    "coverage": "yarn test --test-coverage && yarn coverage:report",
+    "coverage:report": "nyc report --reporter=html",
+    "coverage:clean": "rimraf .nyc_output && rimraf coverage"
+  },
+  "devDependencies": {
+    "@theia/cli": "1.10.0"
+  }
+}

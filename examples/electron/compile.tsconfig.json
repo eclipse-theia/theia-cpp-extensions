@@ -1,0 +1,15 @@
+{
+  "extends": "../../configs/base.tsconfig",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "lib/test"
+  },
+  "include": [
+    "test"
+  ],
+  "references": [
+    {
+      "path": "../../packages/cpp-debug/compile.tsconfig.json"
+    }
+  ]
+}
