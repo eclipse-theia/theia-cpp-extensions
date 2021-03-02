@@ -1,0 +1,17 @@
+{
+  "extends": "./base.tsconfig",
+  "include": [],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "lib"
+  },
+  "references": [
+    {
+      "path": "../examples/electron/compile.tsconfig.json"
+    },
+    {
+      "path": "../packages/cpp-debug/compile.tsconfig.json"
+    }
+  ]
+}

@@ -6,7 +6,9 @@
     "@theia/core": "next",
     "@theia/debug": "next",
     "ajv": "^6.5.3",
-    "lodash": "^4.17.10"
+    "inversify": "^5.0.1",
+    "lodash": "^4.17.10",
+    "react": "^16.11.0"
   },
   "publishConfig": {
     "access": "public"
@@ -38,16 +40,15 @@
   ],
   "scripts": {
     "postinstall": "node -e \"require('@theia/debug/bin/download-adapters.js')\"",
-    "prepare": "yarn run clean && yarn run build",
     "download": "download-debug-adapters",
-    "clean": "theiaext clean",
+    "lint": "theiaext lint",
     "build": "theiaext build",
     "watch": "theiaext watch",
-    "test": "theiaext test",
-    "test:watch": "theiaext test:watch"
+    "clean": "theiaext clean",
+    "test": "theiaext test"
   },
   "devDependencies": {
-    "@theia/ext-scripts": "^0.12.0",
+    "@theia/ext-scripts": "^1.1.0",
     "rimraf": "^2.6.2",
     "tar": "^4.0.0",
     "unzip-stream": "^0.3.0",

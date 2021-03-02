@@ -1,12 +1,17 @@
 {
     "tasks": [
-        {
-            "label": "compile example",
-            "type": "shell",
-            "command": "mkdir -p build && cd build && g++ -g3 -O0 ../a.cpp -o a",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        }
+      {
+        "label": "compile example",
+        "type": "shell",
+        "command": "mkdir -p build && cd build && g++ -g3 -O0 ../a.cpp -o a",
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      }
     ]
 }

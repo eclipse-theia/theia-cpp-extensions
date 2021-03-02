@@ -1,23 +1,45 @@
 {
-  "extends": "./configs/base.tsconfig",
-  "compilerOptions": {
-    "skipLibCheck": false,
-    "baseUrl": ".",
-    "paths": {
-      "@theia/cpp-debug/lib/*": [
-        "packages/cpp-debug/src/*"
-      ]
-    },
-    "plugins": [
-      {
-        "name": "tslint-language-service"
-      }
-    ]
-  },
+  "README": [
+    "THIS FILE SHOULD NOT BE USED FOR COMPILATION.",
+    "THIS FILE IS WRITTEN FOR TSSERVER TO UNDERSTAND OUR MONOREPO.",
+    "SEE `compile.tsconfig.json` FOR COMPILATION CONFIGURATION."
+  ],
+  "extends": "./configs/base.tsconfig.json",
   "include": [
     "dev-packages/*/src",
     "packages/*/src",
-    "browser-app/*/test",
-    "electron-app/*/test"
-  ]
+    "examples/*/src",
+    "examples/browser/src-gen"
+  ],
+  "compilerOptions": {
+    "allowJs": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@theia/application-manager/lib/*": [
+        "dev-packages/application-manager/src/*"
+      ],
+      "@theia/application-package/lib/*": [
+        "dev-packages/application-package/src/*"
+      ],
+      "@theia/cli/lib/*": [
+        "dev-packages/cli/src/*"
+      ],
+      "@theia/electron/*": [
+        "dev-packages/electron/*"
+      ],
+      "@theia/ext-scripts/*": [
+        "dev-packages/ext-scripts/*"
+      ],
+      "@theia/example-browser/*": [
+        "examples/browser/*"
+      ],
+      "@theia/example-electron/*": [
+        "examples/electron/*"
+      ],
+      "@theia/cpp-debug/lib/*": [
+        "packages/cpp-debug/src/*"
+      ]
+    }
+  }
 }

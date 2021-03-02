@@ -1,15 +1,15 @@
 {
   "private": true,
-  "name": "browser-app",
-  "version": "1.0.0",
+  "name": "@theia/example-electron",
+  "productName": "Theia Electron Example",
+  "version": "1.10.0",
+  "main": "src-gen/frontend/electron-main.js",
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
   "theia": {
-    "target": "browser",
+    "target": "electron",
     "frontend": {
       "config": {
-        "applicationName": "Theia C/C++ Extensions Example",
-        "preferences": {
-          "debug.inlineValues": true
-        }
+        "applicationName": "Theia Electron Example"
       }
     }
   },
@@ -31,16 +31,18 @@
     "@theia/typehierarchy": "next",
     "@theia/workspace": "next"
   },
-  "devDependencies": {
-    "@theia/cli": "next"
-  },
   "scripts": {
-    "prepare": "yarn run clean && yarn build",
-    "clean": "theia clean && rimraf errorShots",
-    "build": "theia build --mode development",
+    "lint": "theiaext lint",
+    "clean": "theia clean",
+    "build": "theiaext compile && yarn bundle",
+    "bundle": "theia build --mode development",
     "watch": "concurrently -n compile,bundle \"theiaext watch --preserveWatchOutput\" \"theia build --watch --mode development\"",
-    "start": "theia start --plugins=local-dir:../plugins",
+    "start": "theia start --plugins=local-dir:../../plugins",
     "start:debug": "yarn start --log-level=debug",
-    "test": "true"
+    "test": "electron-mocha --timeout 60000 \"./lib/test/**/*.espec.js\""
+  },
+  "devDependencies": {
+    "@theia/cli": "1.10.0",
+    "electron": "^9.0.2"
   }
 }
