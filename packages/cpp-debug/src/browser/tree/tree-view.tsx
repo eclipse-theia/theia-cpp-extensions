@@ -19,23 +19,45 @@ import { injectable, inject, postConstruct, interfaces, Container } from 'invers
 import { MenuPath } from '@theia/core';
 import { ExpressionContainer } from '@theia/debug/lib/browser/console/debug-console-items';
 
-class Leef extends ExpressionContainer {
-    constructor(protected name: string, protected value: string) {
+/**
+ * Leaf of the tree.
+ * Render a view like 'name: value' into the widget. 
+ * @extends ExressionContainer
+ */
+class Leaf extends ExpressionContainer {
+    /**
+     * Name of the leaf.
+     */
+    protected name: string;
+
+    /**
+     * Value of the leaf.
+     */
+    protected value: string
+    /**
+     * Create a leaf.
+     * @param name The name of the leaf.
+     * @param value The value of the leaf.
+     */
+    constructor(name: string, value: string) {
         super({
             session: () => undefined,
             variablesReference: 0
         });
+        this.name = name;
+        this.value = value;
     }
 
     /**
-     * None
+     * Is the leaf visible. 
      */
     get visible(): boolean {
         return true;
     }
 
     /**
-     * None
+     * 
+     * @return The React view of the leaf.
      */
     render(): React.ReactNode {
         return (
@@ -47,18 +69,26 @@ class Leef extends ExpressionContainer {
     }
 }
 
+/**
+ * Node of the tree.
+ * @extends ExressionContainer
+ */
 export class Node extends ExpressionContainer {
     /**
-     * None
+     * Collection of leafs.
      */
-    public leefs: Map<string, Leef>;
+    public leafs: Set<Leaf>;
 
+    /**
+     * Create a need node.
+     * @param id Id of the new node.
+     */
     constructor(public readonly id: string) {
         super({
             session: () => undefined,
             variablesReference: 1
         });
-        this.leefs = new Map<string, Leef>();
+        this.leafs = new Set<Leaf>();
     }
 
     /**
@@ -69,34 +99,42 @@ export class Node extends ExpressionContainer {
     }
 
     /**
-     * None
+     * Render the node : just give his id to be display.
      */
     render(): React.ReactNode {
         return this.id;
     }
 
     /**
-     * None
-     * @param leef None
+     * Add a new element (leaf)
+     * @param leaf None
      */
-    addElement(leef: {name: string, value: string}): void {
-        this.leefs.set(leef.name, new Leef(leef.name, leef.value));
+    addElement(leaf: {name: string, value: string}): void {
+        this.leafs.add(new Leaf(leaf.name, leaf.value));
     }
 
     /**
-     * None
+     * Get all the elements.
+     * @return An iterator of the elements.
      */
-    async getElements(): Promise<IterableIterator<Leef>> {
-        return this.leefs.values();
+    async getElements(): Promise<IterableIterator<Leaf>> {
+        return this.leafs.values();
     }
 }
 
+/**
+ * Tree.
+ * @extends TreeSource
+ */
 export class Tree extends TreeSource {
     /**
      * Agent content interface.
      */
     protected nodes: Map<string, Node>;
 
+    /**
+     * Create a new tree.
+     */
     constructor() {
         super({
             placeholder: 'Not running'
@@ -105,7 +143,8 @@ export class Tree extends TreeSource {
     }
 
     /**
-     * Add a threads to the tree.
+     * Add a node to the tree.
+     * @param node The node to add to the tree.
      */
     addNode(node: Node): void {
         this.nodes.set(node.id, node);
@@ -113,7 +152,8 @@ export class Tree extends TreeSource {
     }
 
     /**
-     * get all the elements.
+     * Get all the elements.
+     * @return An iterator of the elements.
      */
     getElements(): IterableIterator<Node> {
         return this.nodes.values();
@@ -121,11 +161,17 @@ export class Tree extends TreeSource {
 
 }
 
+/**
+ * InfoTreeWidget.
+ * @extends SourceTreeWidget
+ */
 @injectable()
 export class InfoTreeWidget extends SourceTreeWidget {
 
     /**
-     * None
+     * Function use by Inversify bind.toDynamicValue methode to create a new InfoTreeWidget.
+     * @param parent Parent container.
+     * @return A container with A new instance of InfoTreeWidget bind to itself.
      */
     static createContainer(parent: interfaces.Container): Container {
         const child = SourceTreeWidget.createContainer(parent, {
@@ -139,7 +185,10 @@ export class InfoTreeWidget extends SourceTreeWidget {
     }
 
     /**
-     * None
+     * Create a new InfoTreeWidgete with the Inversify bind.toDynamicValue methode.
+     * @param parent The parent container for creating the widget.
+     * @param id The id of the futur InfoTreeWidget instance.
+     * @return A new instance of InfoTreeWidget.
      */
     static createWidget(parent: interfaces.Container, id: string): InfoTreeWidget {
         const widget = InfoTreeWidget.createContainer(parent).get(InfoTreeWidget);
@@ -148,12 +197,13 @@ export class InfoTreeWidget extends SourceTreeWidget {
     }
 
     /**
-     * None
+     * The tree wich contain the nodes to display.
      */
     protected tree: Tree;
 
     /**
-     * None
+     * Call after the creation by Inversify. Allow us to finish the initialisation
+     * of the widget.
      */
     @postConstruct()
     protected init(): void {
@@ -165,24 +215,25 @@ export class InfoTreeWidget extends SourceTreeWidget {
     }
 
     /**
-     * None
+     * Set the id of the widget.
+     * This should only be use in the process creation of the Widget.
+     * @param id The new id of the Widget.
      */
-    setId(id: string): void {
-        this.id = this.id = 'debug:gpu:threads:' + id;
+    private setId(id: string): void {
+        this.id = 'debug:gpu:threads:' + id;
     }
 
     /**
-     * None
+     * Set the title of the widget.
+     * @param title The new title of the widget.
      */
     setTitle(title: string): void {
-        if (this.title.label) {
-            console.log('ancient titre : ' + this.title.label);
-        }
         this.title.label = title;
     }
 
     /**
-     * None
+     * Add a new node to the reprentating tree.
+     * @param node The node to add to the tree.
      */
      public addNode(node: Node): void {
         this.tree.addNode(node);
