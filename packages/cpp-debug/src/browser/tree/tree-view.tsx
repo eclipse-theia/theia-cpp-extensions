@@ -21,7 +21,7 @@ import { ExpressionContainer } from '@theia/debug/lib/browser/console/debug-cons
 
 /**
  * Leaf of the tree.
- * Render a view like 'name: value' into the widget. 
+ * Render a view like 'name: value' into the widget.
  * @extends ExressionContainer
  */
 class Leaf extends ExpressionContainer {
@@ -33,7 +33,8 @@ class Leaf extends ExpressionContainer {
     /**
      * Value of the leaf.
      */
-    protected value: string
+    protected value: string;
+
     /**
      * Create a leaf.
      * @param name The name of the leaf.
@@ -49,14 +50,14 @@ class Leaf extends ExpressionContainer {
     }
 
     /**
-     * Is the leaf visible. 
+     * Is the leaf visible.
      */
     get visible(): boolean {
         return true;
     }
 
     /**
-     * 
+     * Render the leaf into a React node.
      * @return The React view of the leaf.
      */
     render(): React.ReactNode {

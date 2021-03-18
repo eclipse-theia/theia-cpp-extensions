@@ -94,23 +94,18 @@ export interface ThreadContents {
 }
 
 /**
- * Command option interface.
+ * Command state interface.
  */
 interface CommandState {
     value: string;
 }
 
+/**
+ * Widget which manage the communication between the debugger and the view.
+ */
 export class InfoWidget extends ReactWidget {
     /**
-     * List of agents.
-     */
-    protected agentsList: Array<AgentContents> | undefined;
-    /**
-     * List of queues.
-     */
-    protected queuesList: Array<QueueContents> | undefined;
-    /**
-     * The DebugSessionManager :)
+     * The DebugSessionManager.
      */
     protected debugSessionManager: DebugSessionManager;
 
@@ -125,7 +120,7 @@ export class InfoWidget extends ReactWidget {
     protected divInfo: React.ReactNode;
 
     /**
-     * The React node for display the command info.
+     * The infoView link to this Widget.
      */
     protected infoView: InfoView;
 
@@ -161,11 +156,8 @@ export class InfoWidget extends ReactWidget {
      * @param event the event to be process.
      */
     protected changeCommand = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-        console.log('changement de ' + this.state.value + ' vers ' + event.target.value);
         if (this.debugSessionManager === undefined || this.debugSessionManager.currentSession === undefined) {
             this.divInfo = this.renderErrorMessage(' No agents currently running.');
-            console.log('debugSessionManager : ' + this.debugSessionManager);
-            console.log('currentSession : ' + this.debugSessionManager?.currentSession);
             this.update();
         } else {
             this.state.value = event.target.value;
@@ -174,10 +166,9 @@ export class InfoWidget extends ReactWidget {
     }
 
     /**
-     * Update info.
+     * Analyse the command and call the proper methode.
      */
     protected async updateCommand(): Promise<void> {
-        console.log('updateCommand : ' + this.state.value);
         switch (this.state.value) {
             case 'agents' : {
                 await this.processAgents();
@@ -251,7 +242,6 @@ export class InfoWidget extends ReactWidget {
         const list = await this.getInfoContents<ThreadContents>('cdt-gdb-adapter/Threads');
         if (list) {
             for (const thread of list) {
-                console.log('thread name : ' + thread.name);
                 this.infoView.addThread(thread);
             }
             // this.threads.source = this.threadsGPU;
@@ -261,19 +251,11 @@ export class InfoWidget extends ReactWidget {
         }
     }
 
-    /**
-     * Render the widget.
-     */
-    protected shouldComponentUpdate(): boolean {
-        console.log('shouldComponentUpdate');
-        return true;
-    }
-
+// All the rendering part will be change/remove in the futur.
     /**
      * Render the widget.
      */
     protected render(): React.ReactNode {
-        console.log('render !');
         return (
         <React.Fragment>
             <div id='t-iv-widget' className='t-iv-container' tabIndex={0} >
@@ -292,7 +274,7 @@ export class InfoWidget extends ReactWidget {
 
     /**
      * Render the content of an info agent.
-     * @param agent the agent.
+     * @param agents the list og agents.
      */
     protected renderInfoArrayAgent(agents: Array<AgentContents>): React.ReactNode {
         const tableAgents = <table className='theia-table'>
@@ -446,8 +428,8 @@ export class InfoWidget extends ReactWidget {
     }
 
     /**
-     * Render the content of dispatches.
-     * @param queues the array queues to render.
+     * Render the content of threads.
+     * @param threads the array threads to render.
      */
     protected renderInfoArrayThreads(threads: Array<ThreadContents>): React.ReactNode {
         const tableThreads = <table className='theia-table'>

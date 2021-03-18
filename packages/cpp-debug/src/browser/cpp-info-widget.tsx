@@ -23,6 +23,9 @@ import { Widget, PanelLayout, ViewContainer, BaseWidget } from '@theia/core/lib/
 import { InfoTreeWidget, Node } from './tree/tree-view';
 import { InfoWidget, AgentContents, QueueContents, DispatcheContents, ThreadContents } from './info/info-widget';
 
+/**
+ * Widget container of the Info command view of rocgdb.
+ */
 @injectable()
 export class InfoView extends BaseWidget {
     /**
@@ -42,42 +45,42 @@ export class InfoView extends BaseWidget {
     protected readonly debugSessionManager!: DebugSessionManager;
 
     /**
-     * The DebugSessionManager :)
+     * Widget for the threads.
      */
     @inject('ThreadsTreeWidget')
     protected readonly threads: InfoTreeWidget;
 
     /**
-     * The DebugSessionManager :)
+     * Widget for the queues.
      */
     @inject('QueuesTreeWidget')
     protected readonly queues: InfoTreeWidget;
 
     /**
-     * The DebugSessionManager :)
+     * Widget for the agents.
      */
     @inject('AgentsTreeWidget')
     protected readonly agents: InfoTreeWidget;
 
     /**
-     * The DebugSessionManager :)
+     * Widget for the dispatches.
      */
     @inject('DispatchesTreeWidget')
     protected readonly dispatches: InfoTreeWidget;
 
     /**
-     * The React node for display the command info.
+     * The container for the widgets.
      */
     protected viewContainer: ViewContainer;
 
     /**
-     * The React node for display the command info.
+     * The view container factory to build a nice widget container.
      */
     @inject(ViewContainer.Factory)
     protected readonly viewContainerFactory: ViewContainer.Factory;
 
     /**
-     * The React node for display the command info.
+     * The info command widget link to this view.
      */
     protected info: InfoWidget;
 
@@ -86,39 +89,45 @@ export class InfoView extends BaseWidget {
      */
     @postConstruct()
     protected async init(): Promise<void> {
+        // Set the information for this widget.
         this.id = InfoView.ID;
         this.title.label = InfoView.LABEL;
         this.title.caption = InfoView.LABEL;
         this.title.closable = true;
         this.title.iconClass = 'debug-tab-icon';
+
+        // Create our widget container and the info command widget.
         this.viewContainer = this.viewContainerFactory({
             id: 'debug:view-container:' + 'infoGPU'
         });
         this.info = new InfoWidget(this.debugSessionManager, this);
 
+        // Set the titles of our widgets.
         this.threads.setTitle('Threads');
         this.queues.setTitle('Queues');
         this.agents.setTitle('Agents');
         this.dispatches.setTitle('Dispatches');
 
+        // Add the widget to the container.
         this.viewContainer.addWidget(this.agents, { weight: 30 });
         this.viewContainer.addWidget(this.queues, { weight: 40 });
         this.viewContainer.addWidget(this.dispatches, { weight: 50 });
         this.viewContainer.addWidget(this.threads, { weight: 60 });
         this.viewContainer.addWidget(this.info, { weight: 70 });
 
+        // Tell the system to delete the widget with us when he want to remove us.
         this.toDispose.pushAll([
             this.viewContainer
         ]);
 
+        // Layout to select  how the widgets need to be render.
         const layout = this.layout = new PanelLayout();
         layout.addWidget(this.viewContainer);
-
     }
 
     /**
-     * Handle the `activateRequest` message.
-     * @param msg the activation request message.
+     * Add a thread to the Thread Widget.
+     * @param thread the thread to be add to the view.
      */
     public addThread(thread: ThreadContents): void {
         // this.threads.source = this.threadsGPU;
@@ -132,8 +141,8 @@ export class InfoView extends BaseWidget {
     }
 
     /**
-     * Handle the `activateRequest` message.
-     * @param msg the activation request message.
+     * Add a queue to the Queue Widget.
+     * @param queue the queue to be add to the view.
      */
     public addQueue(queue: QueueContents): void {
         const node = new Node(queue.id);
@@ -147,8 +156,8 @@ export class InfoView extends BaseWidget {
     }
 
     /**
-     * Add a hsa agent to the view.
-     * @param agent the agent to be add.
+     * Add a agent to the Agent Widget.
+     * @param agent the agent to be add to the view.
      */
     public addAgent(agent: AgentContents): void {
         const node = new Node(agent.id);
@@ -163,8 +172,8 @@ export class InfoView extends BaseWidget {
     }
 
     /**
-     * Handle the `activateRequest` message.
-     * @param dispatche the activation request message.
+     * Add a dispatche to the Dispatche Widget.
+     * @param dispatche the dispatche to be add to the view.
      */
     public addDispatche(dispatche: DispatcheContents): void {
         const node = new Node(dispatche.id);
