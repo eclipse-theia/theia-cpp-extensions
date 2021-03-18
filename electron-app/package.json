@@ -14,26 +14,26 @@
     }
   },
   "dependencies": {
-    "@theia/core": "next",
+    "@theia/core": "latest",
     "@theia/cpp-debug": "1.0.0",
-    "@theia/editor": "next",
-    "@theia/electron": "next",
-    "@theia/file-search": "next",
-    "@theia/filesystem": "next",
-    "@theia/markers": "next",
-    "@theia/messages": "next",
-    "@theia/monaco": "next",
-    "@theia/navigator": "next",
-    "@theia/plugin-ext-vscode": "next",
-    "@theia/preferences": "next",
-    "@theia/process": "next",
-    "@theia/task": "next",
-    "@theia/terminal": "next",
-    "@theia/typehierarchy": "next",
-    "@theia/workspace": "next"
+    "@theia/editor": "latest",
+    "@theia/electron": "latest",
+    "@theia/file-search": "latest",
+    "@theia/filesystem": "latest",
+    "@theia/markers": "latest",
+    "@theia/messages": "latest",
+    "@theia/monaco": "latest",
+    "@theia/navigator": "latest",
+    "@theia/plugin-ext-vscode": "latest",
+    "@theia/preferences": "latest",
+    "@theia/process": "latest",
+    "@theia/task": "latest",
+    "@theia/terminal": "latest",
+    "@theia/typehierarchy": "latest",
+    "@theia/workspace": "latest"
   },
   "devDependencies": {
-    "@theia/cli": "next"
+    "@theia/cli": "latest"
   },
   "scripts": {
     "prepare": "theia build --mode development",

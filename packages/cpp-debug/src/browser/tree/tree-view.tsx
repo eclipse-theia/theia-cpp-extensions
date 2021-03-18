@@ -1,10 +1,25 @@
+/********************************************************************************
+ * Copyright (C) 2021 Bohémond Couka, Ericsson and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is available at
+ * https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
 import { SourceTreeWidget, TreeSource, TreeElement, TreeSourceNode } from '@theia/core/lib/browser/source-tree';
 import * as React from 'react';
 import { injectable, inject, postConstruct, interfaces, Container } from 'inversify';
 import { MenuPath } from '@theia/core';
 import { ExpressionContainer } from '@theia/debug/lib/browser/console/debug-console-items';
 
-class Leef extends ExpressionContainer{
+class Leef extends ExpressionContainer {
     constructor(protected name: string, protected value: string) {
         super({
             session: () => undefined,
@@ -12,11 +27,17 @@ class Leef extends ExpressionContainer{
         });
     }
 
-    get visible(){
+    /**
+     * None
+     */
+    get visible(): boolean {
         return true;
     }
-    
-    render(): React.ReactNode{
+
+    /**
+     * None
+     */
+    render(): React.ReactNode {
         return (
         <div className='theia-debug-console-variable name'>
             <span className='name' title='char'>{this.name}: </span>
@@ -26,7 +47,7 @@ class Leef extends ExpressionContainer{
     }
 }
 
-export class Node extends ExpressionContainer{
+export class Node extends ExpressionContainer {
     /**
      * None
      */
@@ -47,15 +68,25 @@ export class Node extends ExpressionContainer{
         return true;
     }
 
+    /**
+     * None
+     */
     render(): React.ReactNode {
         return this.id;
     }
 
-    addElement(leef: {name: string, value: string}) {
-        this.leefs.set(leef.name, new Leef(leef.name, leef.value))
+    /**
+     * None
+     * @param leef None
+     */
+    addElement(leef: {name: string, value: string}): void {
+        this.leefs.set(leef.name, new Leef(leef.name, leef.value));
     }
 
-    async getElements(): Promise<IterableIterator<Leef>>{
+    /**
+     * None
+     */
+    async getElements(): Promise<IterableIterator<Leef>> {
         return this.leefs.values();
     }
 }
@@ -70,7 +101,6 @@ export class Tree extends TreeSource {
         super({
             placeholder: 'Not running'
         });
-        //this.fireDidChange();
         this.nodes = new Map<string, Node>();
     }
 
@@ -83,8 +113,8 @@ export class Tree extends TreeSource {
     }
 
     /**
-    * get all the elements.
-    */
+     * get all the elements.
+     */
     getElements(): IterableIterator<Node> {
         return this.nodes.values();
     }
@@ -97,29 +127,9 @@ export class InfoTreeWidget extends SourceTreeWidget {
     /**
      * None
      */
-    static CONTEXT_MENU: MenuPath = ['debug-threads-context-menu'];
-
-    /**
-     * None
-     */
-    static CONTROL_MENU = [...InfoTreeWidget.CONTEXT_MENU, 'a_control'];
-
-    /**
-     * None
-     */
-    static TERMINATE_MENU = [...InfoTreeWidget.CONTEXT_MENU, 'b_terminate'];
-
-    /**
-     * None
-     */
-    static OPEN_MENU = [...InfoTreeWidget.CONTEXT_MENU, 'c_open'];
-
-    /**
-     * None
-     */
     static createContainer(parent: interfaces.Container): Container {
         const child = SourceTreeWidget.createContainer(parent, {
-            contextMenuPath: InfoTreeWidget.CONTEXT_MENU,
+            contextMenuPath: [],
             virtualized: false,
             scrollIfActive: true
         });
@@ -127,11 +137,14 @@ export class InfoTreeWidget extends SourceTreeWidget {
         child.bind(InfoTreeWidget).toSelf();
         return child;
     }
-    
+
+    /**
+     * None
+     */
     static createWidget(parent: interfaces.Container, id: string): InfoTreeWidget {
-        let widget = InfoTreeWidget.createContainer(parent).get(InfoTreeWidget);
+        const widget = InfoTreeWidget.createContainer(parent).get(InfoTreeWidget);
         widget.setId(id);
-        return widget
+        return widget;
     }
 
     /**
@@ -151,13 +164,19 @@ export class InfoTreeWidget extends SourceTreeWidget {
 
     }
 
+    /**
+     * None
+     */
     setId(id: string): void {
         this.id = this.id = 'debug:gpu:threads:' + id;
     }
 
-    setTitle(title: string): void{
-        if(this.title.label) {
-            console.log('ancient titre : ' + this.title.label)
+    /**
+     * None
+     */
+    setTitle(title: string): void {
+        if (this.title.label) {
+            console.log('ancient titre : ' + this.title.label);
         }
         this.title.label = title;
     }
@@ -167,6 +186,5 @@ export class InfoTreeWidget extends SourceTreeWidget {
      */
      public addNode(node: Node): void {
         this.tree.addNode(node);
-
     }
 }

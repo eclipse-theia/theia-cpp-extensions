@@ -1,12 +1,27 @@
+/********************************************************************************
+ * Copyright (C) 2021 Bohémond Couka, Ericsson and others.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0.
+ *
+ * This Source Code may also be made available under the following Secondary
+ * Licenses when the conditions for such availability set forth in the Eclipse
+ * Public License v. 2.0 are satisfied: GNU General Public License, version 2
+ * with the GNU Classpath Exception which is available at
+ * https://www.gnu.org/software/classpath/license.html.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+ ********************************************************************************/
 import * as React from 'react';
 import { ReactWidget } from '@theia/core/lib/browser';
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
-import { DebugGPUThreads, GPUThread } from '../threads/gpu-threads';
 import { InfoView } from '../cpp-info-widget';
+
 /**
  * Agent content interface.
  */
-interface AgentContents {
+export interface AgentContents {
     id: string;
     'target-id': string;
     name: string;
@@ -18,7 +33,7 @@ interface AgentContents {
 /**
  * Queue content interface.
  */
-interface QueueContents {
+export interface QueueContents {
     id: string;
     'target-id': string;
     type: string;
@@ -31,7 +46,7 @@ interface QueueContents {
 /**
  * Dispatche content interface.
  */
-interface DispatcheContents {
+export interface DispatcheContents {
     id: string;
     'target-id': string;
     grid: string;
@@ -69,7 +84,7 @@ interface Frame {
 /**
  * Thread content interface.
  */
-interface ThreadContents {
+export interface ThreadContents {
     id: string;
     'target-id': string;
     name: string;
@@ -189,7 +204,6 @@ export class InfoWidget extends ReactWidget {
      */
     protected async processAgents(): Promise<void> {
         const list = await this.getInfoContents<AgentContents>('cdt-gdb-adapter/Agents');
-        this.agentsList = list;
         if (list) {
             for (const agent of list) {
                 this.infoView.addAgent(agent);
@@ -205,7 +219,6 @@ export class InfoWidget extends ReactWidget {
      */
     protected async processQueues(): Promise<void> {
         const list = await this.getInfoContents<QueueContents>('cdt-gdb-adapter/Queues');
-        this.queuesList = list;
         if (list) {
             for (const queue of list) {
                 this.infoView.addQueue(queue);

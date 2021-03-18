@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Theia - C/C++ Debug Extension",
   "dependencies": {
-    "@theia/core": "next",
-    "@theia/debug": "next",
+    "@theia/core": "latest",
+    "@theia/debug": "latest",
     "ajv": "^6.5.3",
     "lodash": "^4.17.10"
   },
@@ -54,6 +54,6 @@
     "zlib": "^1.0.5"
   },
   "adapters": {
-    "cdt-gdb-vscode": "https://github.com/bohemondcouka/cdt-gdb-vscode/releases/download/test/cdt-gdb-vscode-0.0.91.tgz"
+    "cdt-gdb-vscode": "https://github.com/bohemondcouka/cdt-gdb-vscode/releases/download/v0.0.91/cdt-gdb-vscode-0.0.96.tgz"
   }
 }
