@@ -73,11 +73,10 @@ export class CppContributionInfo extends AbstractViewContribution<InfoView> {
             widgetId: InfoView.ID,
             widgetName: InfoView.LABEL,
             defaultWidgetOptions: {
-                area: 'bottom'
+                area: 'left'
             },
             toggleCommandId: InfoCommand.id,
         });
-        console.log('Constructor CppContributionInfo');
     }
 
     /**
@@ -86,7 +85,6 @@ export class CppContributionInfo extends AbstractViewContribution<InfoView> {
      * @returns a promise resolving to the memory view widget.
      */
     async openView(_args?: Partial<OpenViewArguments>): Promise<InfoView> {
-        console.log('openView CppContributionInfo');
         return super.openView({ activate: true });
     }
 
