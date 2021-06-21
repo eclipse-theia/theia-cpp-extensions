@@ -3,7 +3,7 @@
   "name": "electron-app",
   "version": "1.0.0",
   "theia": {
-    "target": "browser",
+    "target": "electron",
     "frontend": {
       "config": {
         "applicationName": "Theia C/C++ Extensions Example",
