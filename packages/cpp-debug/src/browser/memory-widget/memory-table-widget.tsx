@@ -14,10 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from 'react';
-import { debounce } from 'lodash';
+import * as React from '@theia/core/shared/react';
+import debounce = require('@theia/core/shared/lodash.debounce');
 import { ContextMenuRenderer, ReactWidget, Widget } from '@theia/core/lib/browser';
-import { injectable, inject, postConstruct } from 'inversify';
+import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { ThemeChangeEvent, ThemeService } from '@theia/core/lib/browser/theming';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import {
@@ -119,7 +119,7 @@ export class MemoryTableWidget extends ReactWidget {
         this.scrollOptions = { ...this.scrollOptions, suppressScrollX: false };
         this.toDispose.push(this.optionsWidget.onOptionsChanged(optionId => this.handleOptionChange(optionId)));
         this.toDispose.push(this.optionsWidget.onMemoryChanged(e => this.handleMemoryChange(e)));
-        this.toDispose.push(this.themeService.onThemeChange(e => this.handleThemeChange(e)));
+        this.toDispose.push(this.themeService.onDidColorThemeChange(e => this.handleThemeChange(e)));
 
         this.getStateAndUpdate();
     }

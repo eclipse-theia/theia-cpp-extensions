@@ -14,10 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from 'react';
+import * as React from '@theia/core/shared/react';
 import { Disposable, DisposableCollection, Emitter } from '@theia/core';
-import { debounce } from 'lodash';
-import { injectable, postConstruct, inject } from 'inversify';
+import debounce = require('@theia/core/shared/lodash.debounce');
+import { injectable, postConstruct, inject } from '@theia/core/shared/inversify';
 import { DebugSession, DebugState } from '@theia/debug/lib/browser/debug-session';
 import { Constants, Interfaces, RegisterWidgetOptions } from '../utils/memory-widget-utils';
 import { MWInputWithSelect } from '../utils/memory-widget-components';

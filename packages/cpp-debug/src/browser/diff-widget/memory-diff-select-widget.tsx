@@ -14,9 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from 'react';
-import { inject, injectable, postConstruct } from 'inversify';
-import { Key, Message, ReactWidget } from '@theia/core/lib/browser';
+import * as React from '@theia/core/shared/react';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { Key, KeyCode, Message, ReactWidget } from '@theia/core/lib/browser';
 import { MWSelect } from '../utils/memory-widget-components';
 import { MemoryWidgetManager } from '../utils/memory-widget-manager';
 import { Interfaces } from '../utils/memory-widget-utils';
@@ -111,7 +111,7 @@ export class MemoryDiffSelectWidget extends ReactWidget {
     }
 
     protected diffIfEnter = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-        if (e.keyCode === Key.ENTER.keyCode) {
+        if (KeyCode.createKeyCode(e.nativeEvent).key?.keyCode === Key.ENTER.keyCode) {
             this.doDiff();
         }
     };

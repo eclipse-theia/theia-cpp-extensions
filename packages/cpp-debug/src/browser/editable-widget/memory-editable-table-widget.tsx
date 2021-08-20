@@ -16,8 +16,8 @@
 
 import { Key, KeyCode } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
-import { injectable, postConstruct } from 'inversify';
-import * as React from 'react';
+import { injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
 import { MemoryTableWidget, MemoryTable } from '../memory-widget/memory-table-widget';
 import { EasilyMappedObject } from '../utils/memory-hover-renderer';
 import { Interfaces } from '../utils/memory-widget-utils';
@@ -235,7 +235,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
         if (this.highlightedField.lessThan(0)) {
             return;
         }
-        const { keyCode } = event;
+        const keyCode = KeyCode.createKeyCode(event.nativeEvent).key?.keyCode;
         const initialHighlight = this.highlightedField;
         const initialHighlightIndex = initialHighlight.subtract(this.memory.address);
         if (keyCode === Key.TAB.keyCode) {

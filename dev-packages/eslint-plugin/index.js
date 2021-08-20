@@ -1,3 +1,4 @@
+// @ts-check
 /********************************************************************************
  * Copyright (C) 2021 Ericsson and others.
  *
@@ -14,12 +15,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { ContainerModule } from 'inversify';
-import { DebugAdapterContribution } from '@theia/debug/lib/common/debug-model';
-import { debugAdapterContributions } from './cpp-debug-backend-contribution';
-
-export default new ContainerModule(bind => {
-    for (const debugAdapterContribution of debugAdapterContributions) {
-        bind(DebugAdapterContribution).to(debugAdapterContribution).inSingletonScope();
-    }
-});
+/** @type {{[ruleId: string]: import('eslint').Rule.RuleModule}} */
+exports.rules = {
+    "shared-dependencies": require('./rules/shared-dependencies'),
+};

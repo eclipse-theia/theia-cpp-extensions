@@ -16,21 +16,6 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@theia/application-manager/lib/*": [
-        "dev-packages/application-manager/src/*"
-      ],
-      "@theia/application-package/lib/*": [
-        "dev-packages/application-package/src/*"
-      ],
-      "@theia/cli/lib/*": [
-        "dev-packages/cli/src/*"
-      ],
-      "@theia/electron/*": [
-        "dev-packages/electron/*"
-      ],
-      "@theia/ext-scripts/*": [
-        "dev-packages/ext-scripts/*"
-      ],
       "@theia/example-browser/*": [
         "examples/browser/*"
       ],
@@ -39,6 +24,15 @@
       ],
       "@theia/cpp-debug/lib/*": [
         "packages/cpp-debug/src/*"
+      ],
+      "@cpp-debug/example-electron/*": [
+        "examples/electron/*"
+      ],
+      "@cpp-debug/example-browser/*": [
+        "examples/browser/*"
+      ],
+      "@theia/eslint-plugin/*": [
+        "dev-packages/eslint-plugin/*"
       ]
     }
   }

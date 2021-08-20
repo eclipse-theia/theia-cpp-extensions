@@ -17,7 +17,7 @@
 import '../../src/browser/style/index.css';
 import '../../src/browser/utils/multi-select-bar.css';
 import '../../src/browser/register-widget/register-widget.css';
-import { ContainerModule } from 'inversify';
+import { ContainerModule } from '@theia/core/shared/inversify';
 import { bindViewContribution, WidgetFactory, FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';

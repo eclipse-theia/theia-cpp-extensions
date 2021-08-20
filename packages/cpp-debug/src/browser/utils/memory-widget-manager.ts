@@ -15,7 +15,7 @@
  ********************************************************************************/
 import { Disposable, DisposableCollection, Emitter, MessageService } from '@theia/core';
 import { ApplicationShell, OpenViewArguments, WidgetManager } from '@theia/core/lib/browser';
-import { injectable, inject, postConstruct } from 'inversify';
+import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { MemoryDiffTableWidget, MemoryDiffWidget } from '../diff-widget/memory-diff-table-widget';
 import { MemoryWidget } from '../memory-widget/memory-widget';
 import { RegisterWidget } from '../register-widget/register-widget-types';

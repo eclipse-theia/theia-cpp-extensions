@@ -16,7 +16,7 @@
 
 import { DockPanelRendererFactory } from '@theia/core/lib/browser';
 import { TheiaDockPanel } from '@theia/core/lib/browser/shell/theia-dock-panel';
-import { interfaces } from 'inversify';
+import { interfaces } from '@theia/core/shared/inversify';
 /* eslint-disable import/export */
 
 export class MemoryDockPanel extends TheiaDockPanel {

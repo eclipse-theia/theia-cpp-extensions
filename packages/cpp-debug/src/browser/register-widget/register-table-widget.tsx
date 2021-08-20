@@ -14,10 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from 'react';
-import { Key } from '@theia/core/lib/browser';
+import * as React from '@theia/core/shared/react';
+import { Key, KeyCode } from '@theia/core/lib/browser';
 import { DebugVariable } from '@theia/debug/lib/browser/console/debug-console-items';
-import { inject, postConstruct } from 'inversify';
+import { inject, postConstruct } from '@theia/core/shared/inversify';
 import { MemoryTableWidget, MemoryTable } from '../memory-widget/memory-table-widget';
 import { RegisterReadResult } from '../utils/memory-widget-variable-utils';
 import { RegisterOptions, RegisterOptionsWidget } from './register-options-widget';
@@ -73,7 +73,7 @@ export class RegisterTableWidget extends MemoryTableWidget {
         this.scrollOptions = { ...this.scrollOptions, suppressScrollX: false };
         this.toDispose.push(this.optionsWidget.onOptionsChanged(optionId => this.handleOptionChange(optionId)));
         this.toDispose.push(this.optionsWidget.onRegisterChanged(e => this.handleRegisterChange(e)));
-        this.toDispose.push(this.themeService.onThemeChange(e => this.handleThemeChange(e)));
+        this.toDispose.push(this.themeService.onDidColorThemeChange(e => this.handleThemeChange(e)));
 
         this.getStateAndUpdate();
     }
@@ -223,7 +223,7 @@ export class RegisterTableWidget extends MemoryTableWidget {
     }
 
     private handleRowKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
-        const { keyCode } = event;
+        const keyCode = KeyCode.createKeyCode(event.nativeEvent).key?.keyCode;
         switch (keyCode) {
             case Key.ENTER.keyCode:
                 this.openDebugVariableByCurrentTarget(event);

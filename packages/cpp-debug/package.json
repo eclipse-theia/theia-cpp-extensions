@@ -3,21 +3,17 @@
   "version": "1.0.0",
   "description": "Theia - C/C++ Debug Extension",
   "dependencies": {
-    "@theia/core": "next",
-    "@theia/debug": "next",
+    "@theia/core": "1.16.0",
+    "@theia/debug": "1.16.0",
     "ajv": "^6.5.3",
-    "inversify": "^5.0.1",
-    "lodash": "^4.17.10",
-    "long": "^4.0.0",
-    "react": "^16.11.0"
+    "long": "^4.0.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/cpp-debug-frontend-module",
-      "backend": "lib/node/cpp-debug-backend-module"
+      "frontend": "lib/browser/cpp-debug-frontend-module"
     }
   ],
   "keywords": [
@@ -42,25 +38,16 @@
   "scripts": {
     "postinstall": "node -e \"require('@theia/debug/bin/download-adapters.js')\"",
     "download": "download-debug-adapters",
-    "lint": "theiaext lint",
-    "build": "theiaext build",
-    "watch": "theiaext watch",
-    "clean": "theiaext clean",
-    "test": "theiaext test"
+    "lint": "if-env SKIP_LINT=true && echo 'skip lint check' || eslint --cache=true --no-error-on-unmatched-pattern=true \"{src,test}/**/*.{ts,tsx}\"",
+    "build": "tsc -b compile.tsconfig.json",
+    "watch": "tsc -p compile.tsconfig.json -w",
+    "clean": "rimraf lib *.tsbuildinfo && rimraf .eslintcache && rimraf .nyc_output coverage",
+    "test": "mocha --opts ../../configs/mocha.opts \"./lib/**/*.*spec.js\""
   },
   "devDependencies": {
-    "@theia/ext-scripts": "^1.1.0",
-    "@types/chai": "^4.1.7",
-    "@types/long": "^4.0.0",
-    "@types/mocha": "^5.2.0",
-    "chai": "^4.2.0",
-    "mocha": "^7.2.0",
-    "rimraf": "^2.6.2",
-    "tar": "^4.0.0",
-    "unzip-stream": "^0.3.0",
-    "zlib": "^1.0.5"
+    "@types/long": "^4.0.0"
   },
-  "adapters": {
-    "cdt-gdb-vscode": "https://github.com/theia-ide/cdt-gdb-vscode/releases/download/v0.0.90-theia.2/cdt-gdb-vscode-0.0.90-theia.2.tgz"
+  "nyc": {
+    "extends": "../../configs/nyc.json"
   }
 }

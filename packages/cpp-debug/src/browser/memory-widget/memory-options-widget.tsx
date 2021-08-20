@@ -15,10 +15,10 @@
  ********************************************************************************/
 /* eslint-disable no-bitwise, max-lines */
 
-import * as React from 'react';
-import { inject, injectable, postConstruct } from 'inversify';
-import { Message, ReactWidget, StatefulWidget, Key } from '@theia/core/lib/browser';
-import { debounce } from 'lodash';
+import * as React from '@theia/core/shared/react';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { Message, ReactWidget, StatefulWidget, Key, KeyCode } from '@theia/core/lib/browser';
+import debounce = require('@theia/core/shared/lodash.debounce');
 import { Disposable, DisposableCollection, Emitter } from '@theia/core';
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
 import { DebugSession, DebugState } from '@theia/debug/lib/browser/debug-session';
@@ -243,7 +243,7 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
         if (e.nativeEvent.type === 'click') {
             e.currentTarget.blur();
         }
-        if ('key' in e && e.keyCode === Key.TAB.keyCode) {
+        if ('key' in e && KeyCode.createKeyCode(e.nativeEvent).key?.keyCode === Key.TAB.keyCode) {
             return;
         }
         this.doUpdateAutomatically = !this.doUpdateAutomatically;
@@ -270,7 +270,7 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
     }
 
     protected toggleDoShowSettings = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>): void => {
-        if (!('key' in e) || e.keyCode !== Key.TAB.keyCode) {
+        if (!('key' in e) || KeyCode.createKeyCode(e.nativeEvent).key?.keyCode === Key.TAB.keyCode) {
             this.doDisplaySettings = !this.doDisplaySettings;
             this.update();
         }
@@ -429,7 +429,10 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
     protected activateHeaderInputField = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>): void => {
         if (!this.isTitleEditable) {
             const isMouseDown = !('key' in e);
-            const isActivationKey = 'key' in e && (e.keyCode === Key.SPACE.keyCode || e.keyCode === Key.ENTER.keyCode);
+            const isActivationKey = 'key' in e && (
+                KeyCode.createKeyCode(e.nativeEvent).key?.keyCode === Key.SPACE.keyCode
+                || KeyCode.createKeyCode(e.nativeEvent).key?.keyCode === Key.ENTER.keyCode
+            );
             if (isMouseDown || isActivationKey) {
                 if (isMouseDown) {
                     e.currentTarget.blur();

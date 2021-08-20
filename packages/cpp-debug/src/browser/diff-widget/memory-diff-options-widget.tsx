@@ -14,10 +14,10 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from 'react';
-import { injectable, inject, postConstruct } from 'inversify';
+import * as React from '@theia/core/shared/react';
+import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { ThemeType } from '@theia/core/lib/browser/theming';
-import { Key } from '@theia/core/lib/browser';
+import { Key, KeyCode } from '@theia/core/lib/browser';
 import { Interfaces, MemoryDiffWidgetData, Utils } from '../utils/memory-widget-utils';
 import { MWInput } from '../utils/memory-widget-components';
 import { DiffLabels } from './memory-diff-widget-types';
@@ -114,7 +114,7 @@ export class MemoryDiffOptionsWidget extends MemoryOptionsWidget {
     }
 
     protected doRefresh = (event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-        if ('key' in event && event.keyCode !== Key.ENTER.keyCode) {
+        if ('key' in event && KeyCode.createKeyCode(event.nativeEvent).key?.keyCode !== Key.ENTER.keyCode) {
             return;
         }
         this.fireDidChangeOptions();

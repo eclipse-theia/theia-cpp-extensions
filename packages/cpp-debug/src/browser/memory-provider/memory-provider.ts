@@ -16,7 +16,7 @@
 
 import { Interfaces } from '../utils/memory-widget-utils';
 import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
-import { injectable, inject } from 'inversify';
+import { injectable, inject } from '@theia/core/shared/inversify';
 import { hexStrToUnsignedLong } from '../../common/util';
 
 export const MemoryProvider = Symbol('MemoryProvider');
@@ -66,26 +66,29 @@ export class MemoryProviderImpl implements MemoryProvider {
 
     /**
      * Read the memory for the given parameters.
-     * @param location the location.
-     * @param length the length.
+     * @param memoryReference the location.
+     * @param count the length.
      * @param offset the offset.
      */
-    async readMemory(location: string, length: number, offset = 0): Promise<Interfaces.MemoryReadResult> {
+    async readMemory(memoryReference: string, count: number, offset = 0): Promise<Interfaces.MemoryReadResult> {
         const session = this.debugSessionManager.currentSession;
         if (session === undefined) {
             throw new Error('No active debug session.');
         }
 
-        const result = await session.sendCustomRequest('cdt-gdb-adapter/Memory', {
-            address: location,
-            length,
+        // @ts-ignore /* Theia 1.17.0 will include the readMemoryRequest in its types. Until then, we can send the request anyway */
+        const result = await session.sendRequest('readMemory', {
+            memoryReference,
+            count,
             offset,
         });
 
-        const bytes = hex2bytes(result.body.data);
-        const address = hexStrToUnsignedLong(result.body.address);
-
-        return { bytes, address };
+        if (result.body?.data) {
+            const bytes = hex2bytes(result.body.data);
+            const address = hexStrToUnsignedLong(result.body.address);
+            return { bytes, address };
+        }
+        throw new Error('Received no data from debug adapter.');
     }
 
     // This functionality is not presently available from the CDT-GDB adapter
