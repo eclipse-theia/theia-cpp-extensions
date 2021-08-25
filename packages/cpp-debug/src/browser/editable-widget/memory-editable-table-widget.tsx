@@ -25,6 +25,8 @@ import * as Long from 'long';
 import { hexStrToUnsignedLong } from '../../common/util';
 import { MemoryWidget } from '../memory-widget/memory-widget';
 import { MemoryOptionsWidget } from '../memory-widget/memory-options-widget';
+import * as Array64 from 'base64-arraybuffer';
+import { DebugProtocol } from 'vscode-debugprotocol';
 
 export type EditableMemoryWidget = MemoryWidget<MemoryOptionsWidget, MemoryEditableTableWidget>;
 export namespace EditableMemoryWidget {
@@ -189,13 +191,15 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
         }
     };
 
-    private * submitMemoryEditInOrder(): IterableIterator<Promise<void>> {
+    private * submitMemoryEditInOrder(): IterableIterator<Promise<DebugProtocol.WriteMemoryResponse | undefined>> {
         this.memoryEditsCompleted = new Deferred();
         const addressesSubmitted = new Set<Long>();
         for (const address of this.pendingMemoryEdits.keys()) {
             const { address: addressToSend, value: valueToSend } = this.composeByte(address, true);
             if (!addressesSubmitted.has(addressToSend)) {
-                yield this.memoryProvider.writeMemory?.(addressToSend.toString(), valueToSend) ?? Promise.resolve();
+                const data = Array64.encode(new Uint8Array([parseInt(valueToSend, 16)]));
+                const writeMemoryArguments = { memoryReference: addressToSend.toString(), data };
+                yield this.memoryProvider.writeMemory?.(writeMemoryArguments) ?? Promise.resolve(undefined);
                 addressesSubmitted.add(addressToSend);
             }
         }

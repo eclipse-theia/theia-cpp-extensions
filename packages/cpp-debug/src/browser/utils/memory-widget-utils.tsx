@@ -89,6 +89,9 @@ export namespace Interfaces {
     }
     export interface ByteFromChunkData {
         address: Long;
+        /**
+         * A single eight-bit byte
+         */
         value: string;
     }
 

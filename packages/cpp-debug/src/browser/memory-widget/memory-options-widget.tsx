@@ -643,11 +643,11 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
         }
     }
 
-    protected async getMemory(startAddress: string, readLength: number, locationOffset: number): Promise<Interfaces.MemoryReadResult> {
-        const result = await this.memoryProvider.readMemory(startAddress, readLength, locationOffset); // .catch(() => toMockMemoryRead());
+    protected async getMemory(memoryReference: string, count: number, offset: number): Promise<Interfaces.MemoryReadResult> {
+        const result = await this.memoryProvider.readMemory({ memoryReference, count, offset });
         this.variables = await getLocals(this.sessionManager.currentSession);
-        this.recentLocations.add(startAddress);
-        this.updateDefaults(startAddress, readLength, locationOffset);
+        this.recentLocations.add(memoryReference);
+        this.updateDefaults(memoryReference, count, offset);
         return result;
     }
 

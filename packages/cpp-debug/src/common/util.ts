@@ -21,14 +21,8 @@ import * as Long from 'long';
  * and return the value as a Long.
  */
 export function hexStrToUnsignedLong(hexStr: string): Long {
-    if (hexStr[0] === '0' && hexStr[1] === 'x') {
-        hexStr = hexStr.slice(2);
+    if (hexStr.trim().length === 0) {
+        return new Long(0, 0, true);
     }
-
-    const lowStr = hexStr.slice(-8);
-    const highStr = hexStr.slice(0, hexStr.length - 8);
-    const low = parseInt(lowStr, 16);
-    const high = parseInt(highStr, 16);
-
-    return new Long(low, high, true);
+    return Long.fromString(hexStr, true, 16);
 }
