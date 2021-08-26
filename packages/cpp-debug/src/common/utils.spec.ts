@@ -39,7 +39,12 @@ describe('utils', function (): void {
         expect(val).eql(new Long(0xabcd1234, 0x12345678, true));
     });
 
-    it('handles long decimal numbers (up to 2^64-1)', () => {
+    it('Handles -1 correctly', () => {
+        const val = hexStrToUnsignedLong('-0x1');
+        expect(val).eql(Long.fromInt(-1, true));
+    });
+
+    it('Handles long decimal numbers (up to 2^64-1)', () => {
         const input = '18446744073709551615';
         const val = Long.fromString(input, true, 10);
         expect(val.toString(10)).eql(input);

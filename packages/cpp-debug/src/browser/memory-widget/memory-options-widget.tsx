@@ -24,12 +24,12 @@ import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-mana
 import { DebugSession, DebugState } from '@theia/debug/lib/browser/debug-session';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import * as Long from 'long';
-import { MemoryProvider } from '../memory-provider/memory-provider';
 import { Recents } from '../utils/memory-recents';
 import { MWSelect, MWInputWithSelect, MWInput } from '../utils/memory-widget-components';
 import { Interfaces, MemoryWidgetOptions, Utils, Constants } from '../utils/memory-widget-utils';
 import { VariableRange, getLocals } from '../utils/memory-widget-variable-utils';
 import { MWMultiSelect, SingleSelectItemProps } from '../utils/multi-select-bar';
+import { MemoryProviderService } from '../memory-provider/memory-provider-service';
 
 export const EMPTY_MEMORY: Interfaces.MemoryReadResult = {
     bytes: new Uint8Array(),
@@ -97,7 +97,7 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
     protected showTitleEditIcon = false;
     protected isTitleEditable = false;
 
-    @inject(MemoryProvider) protected readonly memoryProvider: MemoryProvider;
+    @inject(MemoryProviderService) protected readonly memoryProvider: MemoryProviderService;
     @inject(DebugSessionManager) protected readonly sessionManager: DebugSessionManager;
     @inject(MemoryWidgetOptions) protected readonly memoryWidgetOptions: MemoryWidgetOptions;
 

@@ -220,7 +220,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     private handleTableClick = (event: React.MouseEvent): void => {
         const target = event.target as HTMLElement;
         if (target.classList?.contains('eight-bits')) {
-            this.highlightedField = hexStrToUnsignedLong(target.getAttribute('data-id') ?? '0x-1');
+            this.highlightedField = hexStrToUnsignedLong(target.getAttribute('data-id') ?? '-0x1');
             this.update();
             event.stopPropagation();
         }
@@ -229,7 +229,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     protected doHandleTableRightClick(event: React.MouseEvent): void {
         const target = event.target as HTMLElement;
         if (target.classList?.contains('eight-bits')) {
-            this.highlightedField = hexStrToUnsignedLong(target.getAttribute('data-id') ?? '0x-1');
+            this.highlightedField = hexStrToUnsignedLong(target.getAttribute('data-id') ?? '-0x1');
         }
         super.doHandleTableRightClick(event);
     }

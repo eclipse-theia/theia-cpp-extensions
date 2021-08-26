@@ -15,55 +15,46 @@
  ********************************************************************************/
 
 import { Interfaces } from '../utils/memory-widget-utils';
-import { DebugSessionManager } from '@theia/debug/lib/browser/debug-session-manager';
-import { injectable, inject } from '@theia/core/shared/inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import * as Array64 from 'base64-arraybuffer';
 import Long = require('long');
+import { DebugSession } from '@theia/debug/lib/browser/debug-session';
 
 export const MemoryProvider = Symbol('MemoryProvider');
 /**
- * Representation of a memory provider.
+ * Representation of a memory provider. It is only necessary to implement a new Memory Provider if the behavior of the Debug Adapter for a given session type
+ * deviates from the Debug Adapter Protocol. Otherwise, the DefaultMemoryProvider should handle standard DAP requests and responses.
+ *
+ * Specific peculiarities that might require special handling include: restrictions on the formatting of memory location identifiers (only hex numbers, e.g.)
+ * or deviations from the DAP in the format of the response to a given request.
  */
 export interface MemoryProvider {
     /**
-     * Read `number` bytes of memory at address `location`, which can be
-     * any expression evaluating to an address.
+     * @param session
+     * @return whether the given MemoryProvider can handle memory reading / writing for a session of the type submitted.
      */
-    readMemory(readMemoryArguments: DebugProtocol.ReadMemoryArguments): Promise<Interfaces.MemoryReadResult>;
+    canHandle(session: DebugSession): boolean;
+    readMemory(session: DebugSession, readMemoryArguments: DebugProtocol.ReadMemoryArguments): Promise<Interfaces.MemoryReadResult>;
 
-    /**
-     * @param location any expression evaluating to an address.
-     * @param content the new value to write to that address, as a hex-encoded string.
-     */
-    writeMemory?(writeMemoryArguments: DebugProtocol.WriteMemoryArguments): Promise<DebugProtocol.WriteMemoryResponse>;
+    writeMemory?(session: DebugSession, writeMemoryArguments: DebugProtocol.WriteMemoryArguments): Promise<DebugProtocol.WriteMemoryResponse>;
 }
 
 /**
- * Convert an hex-encoded string of bytes to the Uint8Array equivalent.
+ * Convert a base64-encoded string of bytes to the Uint8Array equivalent.
  */
 export function base64ToBytes(base64: string): Interfaces.LabeledUint8Array {
     return new Uint8Array(Array64.decode(base64));
 }
 
-/**
- * Read memory through the current debug session, using the cdt-gdb-adapter
- * extension to read memory.
- */
 @injectable()
-export class MemoryProviderImpl implements MemoryProvider {
-    /**
-     * Injected debug session manager.
-     */
-    @inject(DebugSessionManager)
-    protected readonly debugSessionManager!: DebugSessionManager;
+export class DefaultMemoryProvider implements MemoryProvider {
+    // This provider should only be used a fallback - it shouldn't volunteer to handle any session.
+    canHandle(): false {
+        return false;
+    }
 
-    async readMemory(readMemoryArguments: DebugProtocol.ReadMemoryArguments): Promise<Interfaces.MemoryReadResult> {
-        const session = this.debugSessionManager.currentSession;
-        if (session === undefined) {
-            throw new Error('No active debug session.');
-        }
-
+    async readMemory(session: DebugSession, readMemoryArguments: DebugProtocol.ReadMemoryArguments): Promise<Interfaces.MemoryReadResult> {
         // @ts-ignore /* Theia 1.17.0 will include the readMemoryRequest in its types. Until then, we can send the request anyway */
         const result = await session.sendRequest('readMemory', readMemoryArguments) as DebugProtocol.ReadMemoryResponse;
 
@@ -76,13 +67,8 @@ export class MemoryProviderImpl implements MemoryProvider {
         throw new Error('Received no data from debug adapter.');
     }
 
-    async writeMemory(writeMemoryArguments: DebugProtocol.WriteMemoryArguments): Promise<DebugProtocol.WriteMemoryResponse> {
-        const { currentSession } = this.debugSessionManager;
-        if (!currentSession) {
-            throw new Error('No active debug session.');
-        }
-
+    async writeMemory(session: DebugSession, writeMemoryArguments: DebugProtocol.WriteMemoryArguments): Promise<DebugProtocol.WriteMemoryResponse> {
         // @ts-ignore /* Theia 1.17.0 will include the writeMemoryRequest in its types. Until then, we can send the request anyway */
-        return currentSession.sendCustomRequest('writeMemory', writeMemoryArguments) as DebugProtocol.WriteMemoryResponse;
+        return session.sendCustomRequest('writeMemory', writeMemoryArguments) as DebugProtocol.WriteMemoryResponse;
     }
 }

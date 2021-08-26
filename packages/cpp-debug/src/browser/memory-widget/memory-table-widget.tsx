@@ -26,10 +26,10 @@ import {
     Constants,
 } from '../utils/memory-widget-utils';
 import { MemoryOptionsWidget } from './memory-options-widget';
-import { MemoryProvider } from '../memory-provider/memory-provider';
 import { MemoryHoverRendererService, EasilyMappedObject } from '../utils/memory-hover-renderer';
 import { VariableDecoration, VariableFinder } from '../utils/memory-widget-variable-utils';
 import { MWMoreMemorySelect } from '../utils/memory-widget-components';
+import { MemoryProviderService } from '../memory-provider/memory-provider-service';
 
 /* eslint-disable @typescript-eslint/no-explicit-any,no-bitwise,react/destructuring-assignment */
 export namespace MemoryTable {
@@ -102,7 +102,7 @@ export class MemoryTableWidget extends ReactWidget {
 
     @inject(ThemeService) protected readonly themeService: ThemeService;
     @inject(MemoryOptionsWidget) readonly optionsWidget: MemoryOptionsWidget;
-    @inject(MemoryProvider) protected readonly memoryProvider: MemoryProvider;
+    @inject(MemoryProviderService) protected readonly memoryProvider: MemoryProviderService;
     @inject(MemoryHoverRendererService) protected readonly hoverRenderer: MemoryHoverRendererService;
     @inject(ContextMenuRenderer) protected readonly contextMenuRenderer: ContextMenuRenderer;
 

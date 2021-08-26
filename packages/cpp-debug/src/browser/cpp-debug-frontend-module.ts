@@ -21,7 +21,7 @@ import { ContainerModule } from '@theia/core/shared/inversify';
 import { bindViewContribution, WidgetFactory, FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
-import { MemoryProvider, MemoryProviderImpl } from './memory-provider/memory-provider';
+import { DefaultMemoryProvider, MemoryProvider } from './memory-provider/memory-provider';
 import { MemoryWidgetManager } from './utils/memory-widget-manager';
 import { DebugFrontendContribution } from './cpp-debug-frontend-contribution';
 import { MemoryDiffWidgetData, MemoryWidgetOptions, RegisterWidgetOptions } from './utils/memory-widget-utils';
@@ -39,6 +39,9 @@ import { MemoryOptionsWidget } from './memory-widget/memory-options-widget';
 import { MemoryWidget } from './memory-widget/memory-widget';
 import { MemoryDockPanel } from './wrapper-widgets/memory-dock-panel';
 import { MemoryDockpanelPlaceholder } from './wrapper-widgets/memory-dockpanel-placeholder-widget';
+import { MemoryProviderService } from './memory-provider/memory-provider-service';
+import { CDTGDBMemoryProvider } from './memory-provider/cdt-gdb-memory-provider';
+import { bindContributionProvider } from '@theia/core';
 
 // eslint-disable-next-line max-lines-per-function
 export default new ContainerModule(bind => {
@@ -47,7 +50,10 @@ export default new ContainerModule(bind => {
     bind(TabBarToolbarContribution).toService(DebugFrontendContribution);
     bind(FrontendApplicationContribution).toService(DebugFrontendContribution);
 
-    bind(MemoryProvider).to(MemoryProviderImpl).inSingletonScope();
+    bind(MemoryProviderService).toSelf().inSingletonScope();
+    bind(DefaultMemoryProvider).toSelf().inSingletonScope();
+    bindContributionProvider(bind, MemoryProvider);
+    bind(MemoryProvider).to(CDTGDBMemoryProvider).inSingletonScope();
     bind(MemoryLayoutWidget).toSelf().inSingletonScope();
     bind(MemoryDiffSelectWidget).toSelf().inSingletonScope();
     bind(MemoryDockpanelPlaceholder).toSelf().inSingletonScope();
