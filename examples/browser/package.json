@@ -14,22 +14,22 @@
     }
   },
   "dependencies": {
-    "@theia/core": "1.16.0",
-    "@theia/cpp-debug": "1.0.0",
-    "@theia/editor": "1.16.0",
-    "@theia/file-search": "1.16.0",
-    "@theia/filesystem": "1.16.0",
-    "@theia/markers": "1.16.0",
-    "@theia/messages": "1.16.0",
-    "@theia/monaco": "1.16.0",
-    "@theia/navigator": "1.16.0",
-    "@theia/plugin-ext-vscode": "1.16.0",
-    "@theia/preferences": "1.16.0",
-    "@theia/process": "1.16.0",
-    "@theia/task": "1.16.0",
-    "@theia/terminal": "1.16.0",
-    "@theia/typehierarchy": "1.16.0",
-    "@theia/workspace": "1.16.0"
+    "@theia/core": "1.17.2",
+    "@theia/cpp-debug": "1.17.2",
+    "@theia/editor": "1.17.2",
+    "@theia/file-search": "1.17.2",
+    "@theia/filesystem": "1.17.2",
+    "@theia/markers": "1.17.2",
+    "@theia/messages": "1.17.2",
+    "@theia/monaco": "1.17.2",
+    "@theia/navigator": "1.17.2",
+    "@theia/plugin-ext-vscode": "1.17.2",
+    "@theia/preferences": "1.17.2",
+    "@theia/process": "1.17.2",
+    "@theia/task": "1.17.2",
+    "@theia/terminal": "1.17.2",
+    "@theia/typehierarchy": "1.17.2",
+    "@theia/workspace": "1.17.2"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn build",
@@ -45,6 +45,6 @@
     "coverage:clean": "rimraf .nyc_output && rimraf coverage"
   },
   "devDependencies": {
-    "@theia/cli": "1.16.0"
+    "@theia/cli": "1.17.2"
   }
 }
