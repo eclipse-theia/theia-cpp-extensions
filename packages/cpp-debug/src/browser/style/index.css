@@ -364,6 +364,7 @@ table.t-mv-view td,
 table.t-mv-view th {
     font-family: monospace;
     padding-right: 15px;
+    white-space: pre;
 }
 
 table.t-mv-view .t-mv-view-row.t-mv-view-row-highlight {
