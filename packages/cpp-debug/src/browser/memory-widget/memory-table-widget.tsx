@@ -30,6 +30,7 @@ import { MemoryHoverRendererService, EasilyMappedObject } from '../utils/memory-
 import { VariableDecoration, VariableFinder } from '../utils/memory-widget-variable-utils';
 import { MWMoreMemorySelect } from '../utils/memory-widget-components';
 import { MemoryProviderService } from '../memory-provider/memory-provider-service';
+import { hexStrToUnsignedLong } from '../../common/util';
 
 /* eslint-disable @typescript-eslint/no-explicit-any,no-bitwise,react/destructuring-assignment */
 export namespace MemoryTable {
@@ -612,7 +613,7 @@ export class MemoryTableWidget extends ReactWidget {
         const args: any[] = [this];
         const id = (event.target as HTMLElement).getAttribute('data-id');
         if (id) {
-            const location = parseInt(id);
+            const location = hexStrToUnsignedLong(id);
             args.push(location);
             const offset = this.memory.address.multiply(-1).add(location);
             const cellAddress = this.memory.address.add(offset.multiply(8 / this.options.byteSize));

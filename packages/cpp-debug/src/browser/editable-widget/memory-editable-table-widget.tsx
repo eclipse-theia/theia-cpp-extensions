@@ -34,7 +34,7 @@ export namespace EditableMemoryWidget {
 
 @injectable()
 export class MemoryEditableTableWidget extends MemoryTableWidget {
-    protected pendingMemoryEdits = new Map<Long, string>();
+    protected pendingMemoryEdits = new Map<string, string>();
     protected previousBytes: Interfaces.LabeledUint8Array | undefined;
     protected memoryEditsCompleted = new Deferred<void>();
     protected highlightedField: Long = Long.fromInt(-1);
@@ -49,7 +49,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     }
 
     resetModifiedValue(valueAddress: Long): void {
-        const didChange = this.pendingMemoryEdits.delete(valueAddress);
+        const didChange = this.pendingMemoryEdits.delete(valueAddress.toString());
         if (didChange) {
             this.update();
         }
@@ -69,7 +69,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     }
 
     protected areSameRegion(a: Interfaces.MemoryReadResult, b?: Interfaces.MemoryReadResult): boolean {
-        return a.address === b?.address && a.bytes.length === b.bytes.length;
+        return b !== undefined && a.address.equals(b.address) && a.bytes.length === b.bytes.length;
     }
 
     protected getTableFooter(): React.ReactNode {
@@ -98,10 +98,10 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
         const attributes = super.getBitAttributes(arrayOffset, iteratee);
         const classNames = attributes.className?.split(' ') ?? [];
         const itemID = this.memory.address.add(arrayOffset);
-        const isHighlight = itemID === this.highlightedField;
-        const isEditPending = this.pendingMemoryEdits.has(itemID);
+        const isHighlight = itemID.equals(this.highlightedField);
+        const isEditPending = this.pendingMemoryEdits.has(itemID.toString());
         const padder = isHighlight && isEditPending ? '\xa0' : '0'; // non-breaking space so it doesn't look like plain whitespace.
-        const stringValue = (this.pendingMemoryEdits.get(itemID) ?? this.memory.bytes[arrayOffset].toString(16)).padStart(2, padder);
+        const stringValue = (this.pendingMemoryEdits.get(itemID.toString()) ?? this.memory.bytes[arrayOffset].toString(16)).padStart(2, padder);
         if (!this.options.isFrozen) {
             if (isHighlight) {
                 classNames.push('highlight');
@@ -165,7 +165,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     }
 
     protected getFromMapOrArray(arrayOffset: Long, usePendingEdits: boolean, dataSource: Uint8Array = this.memory.bytes): string {
-        let value = usePendingEdits ? this.pendingMemoryEdits.get(arrayOffset.add(this.memory.address)) : undefined;
+        let value = usePendingEdits ? this.pendingMemoryEdits.get(arrayOffset.add(this.memory.address).toString()) : undefined;
         if (value === undefined) {
             value = dataSource[arrayOffset.toInt()]?.toString(16) ?? '';
         }
@@ -193,7 +193,8 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     private * submitMemoryEditInOrder(): IterableIterator<Promise<DebugProtocol.WriteMemoryResponse | undefined>> {
         this.memoryEditsCompleted = new Deferred();
         const addressesSubmitted = new Set<Long>();
-        for (const address of this.pendingMemoryEdits.keys()) {
+        for (const k of this.pendingMemoryEdits.keys()) {
+            const address = Long.fromString(k);
             const { address: addressToSend, value: valueToSend } = this.composeByte(address, true);
             if (!addressesSubmitted.has(addressToSend)) {
                 const data = Buffer.from(valueToSend, 'hex').toString('base64');
@@ -245,8 +246,8 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
             return;
         }
         const arrayElementsPerRow = (this.options.byteSize / 8) * this.options.bytesPerGroup * this.options.groupsPerRow;
-        const isAlreadyEdited = this.pendingMemoryEdits.has(this.highlightedField);
-        const oldValue = this.pendingMemoryEdits.get(initialHighlight) ??
+        const isAlreadyEdited = this.pendingMemoryEdits.has(this.highlightedField.toString());
+        const oldValue = this.pendingMemoryEdits.get(initialHighlight.toString()) ??
             this.memory.bytes[initialHighlightIndex.toInt()].toString(16).padStart(2, '0');
         let possibleNewHighlight = new Long(-1);
         let newValue = oldValue;
@@ -300,9 +301,9 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
         }
         const valueWasChanged = newValue !== oldValue;
         if (valueWasChanged) {
-            this.pendingMemoryEdits.set(this.highlightedField, newValue);
+            this.pendingMemoryEdits.set(this.highlightedField.toString(), newValue);
         }
-        if (valueWasChanged || this.highlightedField !== initialHighlight) {
+        if (valueWasChanged || !this.highlightedField.equals(initialHighlight)) {
             this.update();
         }
     };
