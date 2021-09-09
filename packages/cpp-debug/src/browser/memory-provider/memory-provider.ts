@@ -17,7 +17,6 @@
 import { Interfaces } from '../utils/memory-widget-utils';
 import { injectable } from '@theia/core/shared/inversify';
 import { DebugProtocol } from 'vscode-debugprotocol';
-import * as Array64 from 'base64-arraybuffer';
 import Long = require('long');
 import { DebugSession } from '@theia/debug/lib/browser/debug-session';
 
@@ -44,7 +43,7 @@ export interface MemoryProvider {
  * Convert a base64-encoded string of bytes to the Uint8Array equivalent.
  */
 export function base64ToBytes(base64: string): Interfaces.LabeledUint8Array {
-    return new Uint8Array(Array64.decode(base64));
+    return Buffer.from(base64, 'base64');
 }
 
 @injectable()
@@ -55,7 +54,6 @@ export class DefaultMemoryProvider implements MemoryProvider {
     }
 
     async readMemory(session: DebugSession, readMemoryArguments: DebugProtocol.ReadMemoryArguments): Promise<Interfaces.MemoryReadResult> {
-        // @ts-ignore /* Theia 1.17.0 will include the readMemoryRequest in its types. Until then, we can send the request anyway */
         const result = await session.sendRequest('readMemory', readMemoryArguments) as DebugProtocol.ReadMemoryResponse;
 
         if (result.body?.data) {
@@ -68,7 +66,6 @@ export class DefaultMemoryProvider implements MemoryProvider {
     }
 
     async writeMemory(session: DebugSession, writeMemoryArguments: DebugProtocol.WriteMemoryArguments): Promise<DebugProtocol.WriteMemoryResponse> {
-        // @ts-ignore /* Theia 1.17.0 will include the writeMemoryRequest in its types. Until then, we can send the request anyway */
-        return session.sendCustomRequest('writeMemory', writeMemoryArguments) as DebugProtocol.WriteMemoryResponse;
+        return session.sendRequest('writeMemory', writeMemoryArguments);
     }
 }

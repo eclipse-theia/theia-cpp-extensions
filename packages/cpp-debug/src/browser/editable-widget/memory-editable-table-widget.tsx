@@ -25,7 +25,6 @@ import * as Long from 'long';
 import { hexStrToUnsignedLong } from '../../common/util';
 import { MemoryWidget } from '../memory-widget/memory-widget';
 import { MemoryOptionsWidget } from '../memory-widget/memory-options-widget';
-import * as Array64 from 'base64-arraybuffer';
 import { DebugProtocol } from 'vscode-debugprotocol';
 
 export type EditableMemoryWidget = MemoryWidget<MemoryOptionsWidget, MemoryEditableTableWidget>;
@@ -197,7 +196,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
         for (const address of this.pendingMemoryEdits.keys()) {
             const { address: addressToSend, value: valueToSend } = this.composeByte(address, true);
             if (!addressesSubmitted.has(addressToSend)) {
-                const data = Array64.encode(new Uint8Array([parseInt(valueToSend, 16)]));
+                const data = Buffer.from(valueToSend, 'hex').toString('base64');
                 const writeMemoryArguments = { memoryReference: addressToSend.toString(), data };
                 yield this.memoryProvider.writeMemory?.(writeMemoryArguments) ?? Promise.resolve(undefined);
                 addressesSubmitted.add(addressToSend);
