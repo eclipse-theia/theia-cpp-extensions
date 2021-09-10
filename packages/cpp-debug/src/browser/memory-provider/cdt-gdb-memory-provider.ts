@@ -25,15 +25,7 @@ import { DebugProtocol } from 'vscode-debugprotocol';
  * Convert a hex-encoded string of bytes to the Uint8Array equivalent.
  */
 export function hex2bytes(hex: string): Interfaces.LabeledUint8Array {
-    const arr: Interfaces.LabeledUint8Array = new Uint8Array(hex.length / 2);
-
-    for (let i = 0; i < hex.length / 2; i++) {
-        const hexByte = hex.slice(i * 2, i * 2 + 2);
-        const byte = parseInt(hexByte, 16);
-        arr[i] = byte;
-    }
-
-    return arr;
+    return Buffer.from(hex, 'hex');
 }
 
 /**
@@ -48,7 +40,6 @@ export class CDTGDBMemoryProvider implements MemoryProvider {
     }
 
     async readMemory(session: DebugSession, readMemoryArguments: DebugProtocol.ReadMemoryArguments): Promise<Interfaces.MemoryReadResult> {
-        // @ts-ignore /* Theia 1.17.0 will include the readMemoryRequest in its types. Until then, we can send the request anyway */
         const result = await session.sendRequest('readMemory', readMemoryArguments) as DebugProtocol.ReadMemoryResponse;
 
         if (result.body?.data) {
