@@ -610,12 +610,12 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
 
         if (!(this.addressField?.value.length > 0)) {
             this.memoryReadError = 'Enter an address or expression in the Location field.';
-            this.update();
+            this.doShowMemoryErrors();
             return;
         }
         if (this.readLengthField.value.length === 0) {
             this.memoryReadError = 'Enter a length (decimal or hexadecimal number) in the Length field.';
-            this.update();
+            this.doShowMemoryErrors();
             return;
         }
 
