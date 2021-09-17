@@ -631,7 +631,7 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
             }
             this.doShowMemoryErrors(true);
         } catch (err) {
-            this.memoryReadError = 'There was an error fetching memory with specified address length.';
+            this.memoryReadError = this.getUserError(err);
             console.error('Failed to read memory', err);
             this.doShowMemoryErrors();
             if (this.pinnedMemoryReadResult) {
@@ -641,6 +641,10 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
             this.pinnedMemoryReadResult = undefined;
             this.update();
         }
+    }
+
+    protected getUserError(_err: unknown): string {
+        return 'There was an error fetching memory with specified address length.';
     }
 
     protected async getMemory(memoryReference: string, count: number, offset: number): Promise<Interfaces.MemoryReadResult> {
