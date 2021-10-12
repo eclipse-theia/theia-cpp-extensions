@@ -608,14 +608,14 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
     protected async doUpdateMemoryView(): Promise<void> {
         if (!(this.addressField && this.readLengthField)) { return; }
 
-        if (!(this.addressField?.value.length > 0)) {
+        if (this.addressField?.value.trim().length === 0) {
             this.memoryReadError = 'Enter an address or expression in the Location field.';
-            this.update();
+            this.doShowMemoryErrors();
             return;
         }
-        if (this.readLengthField.value.length === 0) {
+        if (this.readLengthField.value.trim().length === 0) {
             this.memoryReadError = 'Enter a length (decimal or hexadecimal number) in the Length field.';
-            this.update();
+            this.doShowMemoryErrors();
             return;
         }
 
@@ -631,7 +631,7 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
             }
             this.doShowMemoryErrors(true);
         } catch (err) {
-            this.memoryReadError = 'There was an error fetching memory with specified address length.';
+            this.memoryReadError = this.getUserError(err);
             console.error('Failed to read memory', err);
             this.doShowMemoryErrors();
             if (this.pinnedMemoryReadResult) {
@@ -641,6 +641,10 @@ export class MemoryOptionsWidget extends ReactWidget implements StatefulWidget {
             this.pinnedMemoryReadResult = undefined;
             this.update();
         }
+    }
+
+    protected getUserError(err: unknown): string {
+        return err instanceof Error ? err.message : 'There was an error fetching memory.';
     }
 
     protected async getMemory(memoryReference: string, count: number, offset: number): Promise<Interfaces.MemoryReadResult> {
