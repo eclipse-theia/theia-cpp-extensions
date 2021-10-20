@@ -721,3 +721,20 @@ table.t-mv-view .t-mv-view-address {
     grid-template-columns: repeat(2, 1fr) 30px;
     grid-template-rows: 18px 24px;
 }
+
+#memory-table-widget.editable .t-mv-view .eight-bits:hover {
+    cursor: pointer;
+}
+
+#memory-table-widget.editable .t-mv-memory-container:focus .eight-bits.highlight {
+    cursor: text;
+}
+
+.diff-options-widget .memory-widget-header-click-zone,
+.diff-options-widget .toggle-settings-click-zone,
+#memory-layout-widget .memory-widget-header-click-zone,
+#memory-layout-widget .toggle-settings-click-zone,
+#memory-layout-widget .fa-unlock,
+#memory-layout-widget .fa-lock {
+    cursor: pointer;
+}
