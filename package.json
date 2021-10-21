@@ -11,8 +11,8 @@
     "**/node-abi": "^2.18.0"
   },
   "devDependencies": {
-    "@theia/cli": "1.17.2",
-    "@theia/eslint-plugin": "1.17.2",
+    "@theia/cli": "1.18.0",
+    "@theia/eslint-plugin": "1.18.0",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/eslint-plugin-tslint": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
