@@ -1,6 +1,6 @@
 {
   "name": "@theia/cpp-debug",
-  "version": "1.18.0",
+  "version": "1.18.2",
   "description": "Theia - C/C++ Debug Extension",
   "dependencies": {
     "@theia/core": "1.18.0",
