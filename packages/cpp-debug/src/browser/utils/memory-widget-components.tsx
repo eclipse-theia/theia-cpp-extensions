@@ -14,6 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+import { Key, KeyCode } from '@theia/core/lib/browser';
 import * as React from '@theia/core/shared/react';
 import { Interfaces } from './memory-widget-utils';
 
@@ -156,12 +157,16 @@ export const MWMoreMemorySelect: React.FC<MoreMemoryProps> = ({ options, handler
         const { value } = e.currentTarget;
         setNumBytes(parseInt(value));
     };
-    const loadMoreMemory = (_e: React.MouseEvent | React.KeyboardEvent): void => {
+
+    const loadMoreMemory = (e: React.MouseEvent | React.KeyboardEvent): void => {
         containerRef.current?.blur();
-        handler({
-            numBytes,
-            direction,
-        });
+        const doHandle = !('key' in e) || KeyCode.createKeyCode(e.nativeEvent).key?.keyCode === Key.ENTER.keyCode;
+        if (doHandle) {
+            handler({
+                numBytes,
+                direction,
+            });
+        }
     };
 
     return (
