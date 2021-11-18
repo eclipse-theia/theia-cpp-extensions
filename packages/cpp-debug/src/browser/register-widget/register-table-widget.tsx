@@ -250,6 +250,7 @@ export class RegisterTableWidget extends MemoryTableWidget {
     }
 
     protected doHandleTableRightClick(event: React.MouseEvent): void {
+        event.preventDefault();
         const curTarget = event.currentTarget as HTMLElement;
         if (curTarget.tagName === 'TR') {
             this.update();

@@ -594,6 +594,7 @@ export class MemoryTableWidget extends ReactWidget {
     protected handleTableRightClick = (e: React.MouseEvent): void => this.doHandleTableRightClick(e);
 
     protected doHandleTableRightClick(event: React.MouseEvent): void {
+        event.preventDefault();
         const target = event.target as HTMLElement;
         if (target.classList?.contains('eight-bits')) {
             const { right, top } = target.getBoundingClientRect();
