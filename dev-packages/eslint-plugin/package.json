@@ -4,6 +4,6 @@
   "version": "1.18.4",
   "description": "Custom ESLint rules for developing Theia extensions and applications",
   "dependencies": {
-    "@theia/core": "1.18.0"
+    "@theia/core": "1.19.0"
   }
 }
