@@ -14,23 +14,23 @@
     }
   },
   "dependencies": {
-    "@theia/core": "1.18.0",
+    "@theia/core": "1.19.0",
     "@theia/cpp-debug": "1.18.4",
-    "@theia/editor": "1.18.0",
-    "@theia/electron": "1.18.0",
-    "@theia/file-search": "1.18.0",
-    "@theia/filesystem": "1.18.0",
-    "@theia/markers": "1.18.0",
-    "@theia/messages": "1.18.0",
-    "@theia/monaco": "1.18.0",
-    "@theia/navigator": "1.18.0",
-    "@theia/plugin-ext-vscode": "1.18.0",
-    "@theia/preferences": "1.18.0",
-    "@theia/process": "1.18.0",
-    "@theia/task": "1.18.0",
-    "@theia/terminal": "1.18.0",
-    "@theia/typehierarchy": "1.18.0",
-    "@theia/workspace": "1.18.0"
+    "@theia/editor": "1.19.0",
+    "@theia/electron": "1.19.0",
+    "@theia/file-search": "1.19.0",
+    "@theia/filesystem": "1.19.0",
+    "@theia/markers": "1.19.0",
+    "@theia/messages": "1.19.0",
+    "@theia/monaco": "1.19.0",
+    "@theia/navigator": "1.19.0",
+    "@theia/plugin-ext-vscode": "1.19.0",
+    "@theia/preferences": "1.19.0",
+    "@theia/process": "1.19.0",
+    "@theia/task": "1.19.0",
+    "@theia/terminal": "1.19.0",
+    "@theia/typehierarchy": "1.19.0",
+    "@theia/workspace": "1.19.0"
   },
   "scripts": {
     "lint": "if-env SKIP_LINT=true && echo 'skip lint check' || eslint --cache=true --no-error-on-unmatched-pattern=true \"{src,test}/**/*.{ts,tsx}\"",
@@ -43,6 +43,6 @@
     "test": "electron-mocha --timeout 60000 \"./lib/test/**/*.espec.js\""
   },
   "devDependencies": {
-    "@theia/cli": "1.18.0"
+    "@theia/cli": "1.19.0"
   }
 }
