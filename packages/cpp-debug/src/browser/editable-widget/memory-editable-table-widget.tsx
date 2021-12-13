@@ -46,6 +46,7 @@ export class MemoryEditableTableWidget extends MemoryTableWidget {
     protected async init(): Promise<void> {
         this.memoryEditsCompleted.resolve();
         await super.init();
+        this.addClass('editable');
     }
 
     resetModifiedValue(valueAddress: Long): void {
