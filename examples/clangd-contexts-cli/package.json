@@ -1,0 +1,33 @@
+{
+  "name": "@theia/clangd-contexts-cli",
+  "displayName": "Theia Clangd Contexts CLI",
+  "description": "Theia - Command-line tool for management of configuration contexts in clangd.",
+  "version": "1.0.0",
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
+  "dependencies": {
+    "@theia/clangd-contexts": "1.0.0",
+    "commander": "^8.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.2",
+    "@types/node": "~12"
+  },
+  "scripts": {
+    "clean": "rimraf lib *.tsbuildinfo && rimraf .eslintcache && rimraf .nyc_output coverage",
+    "lint": "if-env SKIP_LINT=true && echo 'skip lint check' || eslint --cache=true --no-error-on-unmatched-pattern=true \"{src,test}/**/*.{ts,tsx}\"",
+    "build": "tsc -b compile.tsconfig.json && chmod +x lib/app.js",
+    "cli": "node lib/app.js"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
+  "types": "lib/index",
+  "bin": {
+    "clangd-context": "lib/app.js"
+  },
+  "nyc": {
+    "extends": "../../configs/nyc.json"
+  }
+}

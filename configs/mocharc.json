@@ -1,0 +1,9 @@
+{
+  "require": [
+    "ignore-styles",
+    "reflect-metadata/Reflect"
+  ],
+  "reporter": "spec",
+  "watchExtensions": "js",
+  "exit": true
+}

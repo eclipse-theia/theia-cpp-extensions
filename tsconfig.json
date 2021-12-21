@@ -25,6 +25,12 @@
       "@theia/cpp-debug/lib/*": [
         "packages/cpp-debug/src/*"
       ],
+      "@theia/clangd-contexts-cli/lib/*": [
+        "examples/clangd-contexts-cli/src/*"
+      ],
+      "@theia/clangd-contexts/lib/*": [
+        "packages/clangd-contexts/src/*"
+      ],
       "@cpp-debug/example-electron/*": [
         "examples/electron/*"
       ],
@@ -33,6 +39,9 @@
       ],
       "@theia/eslint-plugin/*": [
         "dev-packages/eslint-plugin/*"
+      ],
+      "theia-clangd-contexts-ext/lib/*": [
+        "examples/clangd-contexts-ext/src/*"
       ]
     }
   }

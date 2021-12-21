@@ -66,5 +66,21 @@
             "*": "${webRoot}/*"
           }
         },
+        {
+            "name": "Launch Clangd Contexts Example Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "${workspaceFolder}/examples/clangd-workspace",
+                "--extensionDevelopmentPath=${workspaceRoot}/examples/clangd-contexts-ext"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/packages/**/lib/**/*.js",
+                "${workspaceRoot}/examples/**/lib/**/*.js"
+            ]
+        },
     ]
 }

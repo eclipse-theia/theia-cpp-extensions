@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "overrides": [
+    {
+      "files": [
+        "**/app.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/tslint/config": [
+          "error",
+          {
+            "rules": {
+              "file-header": false,
+              "jsdoc-format": [
+                true,
+                "check-multiline-start"
+              ],
+              "one-line": [
+                true,
+                "check-open-brace",
+                "check-catch",
+                "check-else",
+                "check-whitespace"
+              ],
+              "typedef": [
+                true,
+                "call-signature",
+                "property-declaration"
+              ],
+              "whitespace": [
+                true,
+                "check-branch",
+                "check-decl",
+                "check-operator",
+                "check-separator",
+                "check-type"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

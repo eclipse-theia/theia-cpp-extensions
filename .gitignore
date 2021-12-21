@@ -16,6 +16,7 @@ examples/*/gen-webpack.config.js
 examples/*/.theia
 examples/*/.vscode
 examples/*/.test
+examples/*/*.vsix
 .browser_modules
 **/docs/api
 package-backup.json

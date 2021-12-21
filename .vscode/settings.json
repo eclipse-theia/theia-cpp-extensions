@@ -58,4 +58,11 @@
   "editor.rulers": [
     180
   ], // ESLint `max-len` rule.
+  "markdownlint.config": {
+    "default": true,
+    "MD007": {
+      "indent": 4
+    },
+    "MD030": false
+  },
 }

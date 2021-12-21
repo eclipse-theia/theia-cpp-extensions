@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.5)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_C_COMPILER_ID GNU)
+set(CMAKE_CXX_COMPILER_ID GNU)
+set(CMAKE_C_COMPILER_FORCED TRUE)
+set(CMAKE_CXX_COMPILER_FORCED TRUE)
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_CXX_COMPILER g++)
+
+project(lib)
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+set(TARGET_FLAGS "-Wconversion ${EXT_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${TARGET_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TARGET_FLAGS}")
+
+set(source_files
+    lib.c
+)
+
+add_library(${LIBNAME} STATIC ${source_files})

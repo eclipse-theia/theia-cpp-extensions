@@ -1,0 +1,73 @@
+{
+  "private": true,
+  "name": "theia-clangd-contexts-ext",
+  "displayName": "Theia Clangd Contexts Extension",
+  "description": "Theia - Extension to provide clangd context support.",
+  "version": "1.0.0",
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
+  "publisher": "theia",
+  "repository": "https://github.com/eclipse-theia/theia-cpp-extensions",
+  "engines": {
+    "vscode": "^1.59.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "multi-root ready",
+    "clangd"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./lib/extension.js",
+  "scripts": {
+    "clean": "rimraf lib *.tsbuildinfo && rimraf .eslintcache && rimraf .nyc_output coverage",
+    "package": "vsce package --no-yarn && copyfiles theia-clangd-contexts-ext-1.0.0.vsix ../../plugins",
+    "lint": "if-env SKIP_LINT=true && echo 'skip lint check' || eslint --cache=true --no-error-on-unmatched-pattern=true \"{src,test}/**/*.{ts,tsx}\"",
+    "build": "tsc -b compile.tsconfig.json",
+    "watch": "tsc -p compile.tsconfig.json -w"
+  },
+  "dependencies": {
+    "@theia/clangd-contexts": "1.0.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "theia-clangd-contexts.change.buildConfig",
+        "title": "Clangd: Change build configuration"
+      },
+      {
+        "command": "theia-clangd-contexts.ignore.gccFlags",
+        "title": "Clangd: Suppress unsupported GCC flags"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "theia-clangd-contexts.ignore.gccFlags",
+          "group": "file"
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "14.x",
+    "@types/vscode": "^1.59.0",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^7.27.0",
+    "mocha": "^8.4.0",
+    "vsce": "^1.100.1",
+    "vscode-test": "^1.5.2"
+  },
+  "workspaces": {
+    "nohoist": [
+      "**/@theia/clangd-contexts"
+    ]
+  }
+}

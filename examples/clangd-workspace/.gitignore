@@ -1,0 +1,4 @@
+!lib/
+**/Debug_x86-64
+**/Release_Atom
+**/.clangd

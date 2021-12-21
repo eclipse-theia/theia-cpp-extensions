@@ -12,6 +12,15 @@
     },
     {
       "path": "../packages/cpp-debug/compile.tsconfig.json"
+    },
+    {
+      "path": "../packages/clangd-contexts/compile.tsconfig.json"
+    },
+    {
+      "path": "../examples/clangd-contexts-cli/compile.tsconfig.json"
+    },
+    {
+      "path": "../examples/clangd-contexts-ext/compile.tsconfig.json"
     }
   ]
 }

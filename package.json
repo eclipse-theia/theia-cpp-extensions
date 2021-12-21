@@ -35,10 +35,11 @@
   "scripts": {
     "preinstall": "node-gyp install",
     "postinstall": "node scripts/post-install.js",
-    "prepare": "yarn prepare:references && yarn prepare:build && yarn prepare:hoisting && yarn download:plugins",
+    "prepare": "yarn prepare:references && yarn prepare:build && yarn prepare:hoisting && yarn download:plugins && yarn prepare:package",
     "prepare:references": "node scripts/compile-references.js",
     "prepare:build": "yarn build && lerna run lint && lerna run build \"@theia/example-*\" --stream --parallel",
     "prepare:hoisting": "theia check:hoisted -s",
+    "prepare:package": "lerna run package theia-clangd-contexts-ext --stream",
     "clean": "yarn lint:clean && node scripts/run-reverse-topo.js yarn clean",
     "build": "tsc -b configs/root-compilation.tsconfig.json",
     "watch": "tsc -b configs/root-compilation.tsconfig.json -w",
@@ -60,7 +61,9 @@
     "next:publish": "lerna publish --exact --canary=next --npm-tag=next --yes",
     "publish:check": "node scripts/check-publish.js",
     "start:browser": "yarn rebuild:browser && yarn --cwd examples/browser start",
+    "start:browser:clangd": "yarn start:browser --root-dir=../clangd-workspace",
     "start:electron": "yarn rebuild:electron && yarn --cwd examples/electron start",
+    "start:electron:clangd": "yarn start:electron --root-dir=../clangd-workspace",
     "download:plugins": "theia download:plugins"
   },
   "workspaces": [
