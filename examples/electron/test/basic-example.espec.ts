@@ -16,13 +16,13 @@
 
 import * as chai from 'chai';
 import * as path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow } from '@theia/core/electron-shared/@electron/remote';
 
 const expect = chai.expect;
 
 describe.skip('basic-example-spec', () => {
 
-    const mainWindow: Electron.BrowserWindow = new BrowserWindow({ show: false });
+    const mainWindow = new BrowserWindow({ show: false });
     mainWindow.on('ready-to-show', () => mainWindow.show());
 
     describe('01 #start example app', () => {
