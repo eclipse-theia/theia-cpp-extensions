@@ -14,23 +14,22 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from '@theia/core/shared/react';
-import debounce = require('@theia/core/shared/lodash.debounce');
 import { ContextMenuRenderer, ReactWidget, Widget } from '@theia/core/lib/browser';
-import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
-import { ThemeChangeEvent, ThemeService } from '@theia/core/lib/browser/theming';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { Deferred } from '@theia/core/lib/common/promise-util';
-import {
-    Utils,
-    Interfaces,
-    Constants,
-} from '../utils/memory-widget-utils';
-import { MemoryOptionsWidget } from './memory-options-widget';
-import { MemoryHoverRendererService, EasilyMappedObject } from '../utils/memory-hover-renderer';
-import { VariableDecoration, VariableFinder } from '../utils/memory-widget-variable-utils';
-import { MWMoreMemorySelect } from '../utils/memory-widget-components';
-import { MemoryProviderService } from '../memory-provider/memory-provider-service';
+import { ThemeChangeEvent } from '@theia/core/lib/common/theme';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
 import { hexStrToUnsignedLong } from '../../common/util';
+import { MemoryProviderService } from '../memory-provider/memory-provider-service';
+import { EasilyMappedObject, MemoryHoverRendererService } from '../utils/memory-hover-renderer';
+import { MWMoreMemorySelect } from '../utils/memory-widget-components';
+import {
+    Constants, Interfaces, Utils
+} from '../utils/memory-widget-utils';
+import { VariableDecoration, VariableFinder } from '../utils/memory-widget-variable-utils';
+import { MemoryOptionsWidget } from './memory-options-widget';
+import debounce = require('@theia/core/shared/lodash.debounce');
 
 /* eslint-disable @typescript-eslint/no-explicit-any,no-bitwise,react/destructuring-assignment */
 export namespace MemoryTable {

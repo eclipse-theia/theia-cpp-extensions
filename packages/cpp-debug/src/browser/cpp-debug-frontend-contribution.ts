@@ -14,38 +14,31 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { AbstractViewContribution, FrontendApplicationContribution, Widget } from '@theia/core/lib/browser';
-import { CommandRegistry, MenuModelRegistry, Command } from '@theia/core/lib/common';
+import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
+import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core/lib/common';
+import { Color } from '@theia/core/lib/common/color';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { DebugScope, DebugVariable } from '@theia/debug/lib/browser/console/debug-console-items';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugVariablesWidget } from '@theia/debug/lib/browser/view/debug-variables-widget';
-import { DebugScope, DebugVariable } from '@theia/debug/lib/browser/console/debug-console-items';
-import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
-import { Color, ColorRegistry } from '@theia/core/lib/browser/color-registry';
-import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { MemoryWidgetManager } from './utils/memory-widget-manager';
-import { MemoryEditableTableWidget } from './editable-widget/memory-editable-table-widget';
-import {
-    MemoryCommand,
-    ViewVariableInMemoryCommand,
-    ResetModifiedCellCommand,
-    CreateNewMemoryViewCommand,
-    FollowPointerTableCommand,
-    FollowPointerDebugCommand,
-    CreateNewRegisterViewCommand,
-    ViewVariableInRegisterViewCommand,
-    RegisterSetVariableCommand,
-    ToggleDiffSelectWidgetVisibilityCommand,
-} from './utils/memory-commands';
-import { MemoryLayoutWidget } from './wrapper-widgets/memory-layout-widget';
-import { VariableRange } from './utils/memory-widget-variable-utils';
-import { MemoryTableWidget } from './memory-widget/memory-table-widget';
-import { RegisterWidget } from './register-widget/register-widget-types';
-import { RegisterTableWidget } from './register-widget/register-table-widget';
 import * as Long from 'long';
+import { MemoryEditableTableWidget } from './editable-widget/memory-editable-table-widget';
+import { MemoryTableWidget } from './memory-widget/memory-table-widget';
 import { MemoryWidget } from './memory-widget/memory-widget';
+import { RegisterTableWidget } from './register-widget/register-table-widget';
+import { RegisterWidget } from './register-widget/register-widget-types';
+import {
+    CreateNewMemoryViewCommand, CreateNewRegisterViewCommand, FollowPointerDebugCommand, FollowPointerTableCommand, MemoryCommand,
+    RegisterSetVariableCommand, ResetModifiedCellCommand, ToggleDiffSelectWidgetVisibilityCommand, ViewVariableInMemoryCommand, ViewVariableInRegisterViewCommand
+} from './utils/memory-commands';
+import { MemoryWidgetManager } from './utils/memory-widget-manager';
+import { VariableRange } from './utils/memory-widget-variable-utils';
 import { MemoryDockPanel } from './wrapper-widgets/memory-dock-panel';
+import { MemoryLayoutWidget } from './wrapper-widgets/memory-layout-widget';
 
 const ONE_HALF_OPACITY = 0.5;
 

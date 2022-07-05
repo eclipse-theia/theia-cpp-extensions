@@ -1,10 +1,10 @@
 {
   "name": "@theia/cpp-debug",
-  "version": "1.19.0",
+  "version": "1.27.0",
   "description": "Theia - C/C++ Debug Extension",
   "dependencies": {
-    "@theia/core": "1.19.0",
-    "@theia/debug": "1.19.0",
+    "@theia/core": "1.27.0",
+    "@theia/debug": "1.27.0",
     "long": "^4.0.0",
     "vscode-debugprotocol": "^1.48.0"
   },

@@ -30,9 +30,6 @@
       ],
       "@cpp-debug/example-browser/*": [
         "examples/browser/*"
-      ],
-      "@theia/eslint-plugin/*": [
-        "dev-packages/eslint-plugin/*"
       ]
     }
   }

@@ -14,21 +14,21 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
+const Electron = require('@theia/core/electron-shared/electron');
 import * as chai from 'chai';
 import * as path from 'path';
-import { app, BrowserWindow } from 'electron';
 
 const expect = chai.expect;
 
 describe.skip('basic-example-spec', () => {
 
-    const mainWindow: Electron.BrowserWindow = new BrowserWindow({ show: false });
+    const mainWindow = new Electron.BrowserWindow({ show: false });
     mainWindow.on('ready-to-show', () => mainWindow.show());
 
     describe('01 #start example app', () => {
         it('should start the electron example app', async () => {
-            if (!app.isReady()) {
-                await new Promise(resolve => app.on('ready', resolve));
+            if (!Electron.app.isReady()) {
+                await new Promise(resolve => Electron.app.on('ready', resolve));
             }
 
             require('../src-gen/backend/main'); // start the express server

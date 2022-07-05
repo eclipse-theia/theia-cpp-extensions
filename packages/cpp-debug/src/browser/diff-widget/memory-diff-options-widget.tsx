@@ -14,14 +14,14 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import * as React from '@theia/core/shared/react';
-import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
-import { ThemeType } from '@theia/core/lib/browser/theming';
 import { Key, KeyCode } from '@theia/core/lib/browser';
-import { Interfaces, MemoryDiffWidgetData, Utils } from '../utils/memory-widget-utils';
+import { ThemeType } from '@theia/core/lib/common/theme';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
+import { LENGTH_FIELD_ID, LOCATION_OFFSET_FIELD_ID, MemoryOptionsWidget } from '../memory-widget/memory-options-widget';
 import { MWInput } from '../utils/memory-widget-components';
+import { Interfaces, MemoryDiffWidgetData, Utils } from '../utils/memory-widget-utils';
 import { DiffLabels } from './memory-diff-widget-types';
-import { MemoryOptionsWidget, LOCATION_OFFSET_FIELD_ID, LENGTH_FIELD_ID } from '../memory-widget/memory-options-widget';
 
 export interface DiffMemoryOptions extends Interfaces.MemoryOptions {
     beforeOffset: number;
