@@ -30,7 +30,10 @@
     "tslint": "^5.12.0",
     "typescript": "~4.5.5"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/node": "12",
+    "node-abi": "^2.18.0"
+  },
   "scripts": {
     "preinstall": "node-gyp install",
     "postinstall": "node scripts/post-install.js",
