@@ -17,14 +17,18 @@
 
 </div>
 
+## Disclaimer
+
+The repository is now **deprecated**, `@theia/cpp-debug` is replaced by [`@theia/memory-inspector`](https://github.com/eclipse-theia/theia/tree/master/packages/memory-inspector#readme).
+
 ## Overview
 Collection of Theia extensions related to C/C++ development.
 
 ## Features
-- `@theia/cpp-debug`:
+- `@theia/cpp-debug`: **deprecated** - replaced by [`@theia/memory-inspector`](https://github.com/eclipse-theia/theia/tree/master/packages/memory-inspector#readme)
    - Debugging support using `GDB` through the `cdt-gdb-vscode` extension.
    - Memory view (monitor process memory during debug sessions).
-- `@theia/cpp` **deprecated** and **removed** ([past sources](https://github.com/eclipse-theia/theia-cpp-extensions/tree/184f7751f13e1ec021ccae3f076915867168d28d/packages/cpp)): 
+- `@theia/cpp` **deprecated** and **removed** ([past sources](https://github.com/eclipse-theia/theia-cpp-extensions/tree/184f7751f13e1ec021ccae3f076915867168d28d/packages/cpp)):
    - **Deprecated** C/C++ language-features extension.\
    (Language-features should instead be contributed by VS Code extensions).
 

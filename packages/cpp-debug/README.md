@@ -1,4 +1,4 @@
-# cpp-debug
+# cpp-debug (deprecated)
 
 This extension contributes a set of widgets for viewing memory in different ways.
 
